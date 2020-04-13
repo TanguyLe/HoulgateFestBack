@@ -1,37 +1,43 @@
 # HoulgateFest - Back
+
+This repository hosts the code for the backend of the HoulgateFest website. It is a full Javascript application
+written in node.js + express, with
+authentication/logging and whose main feature is to be able to "shotgun" (reserve) a room in a house.
+
+It is meant to work alongside its frontend : https://github.com/TanguyLe/HoulgateFestFront.
+
 ## Installation
-Note: For Windows, a bit more work to setup mongo at https://docs.mongodb.com/manual/tutorial/install-mongodb-on-windows/.
+### Prerequisites
+1. Node and npm installed, recommended versions are node 12.13.1 and npm 6.12.1.
+2. Repo cloned.
+3. MongoDB installed and started, recommended version is 3.6.17.
+4. Get the credential files from the project's owner. (those are secret files not hosted on git)
 
-1. Do step 1 and 2 in the front readme if not done before, and install the modules:
-```shell
-cd HoulgateFest/back
-npm install
-```
-2. Install mongodb by the following steps:
+### Packages
+Just use `npm install` within the project directory and you're good to go !
 
-a. Import the public key:
-```shell
-sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2930ADAE8CAF5059EE73BB4B58712A2291FA4AD5
-```
-b. Create a list file (for 16.04, otherwise see at https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/):
-```shell
-echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.6 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.6.list
-```
-c. Update packages:
-```shell
-sudo apt-get update
-```
-d. Install the latest stable version:
-```shell
-sudo apt-get install -y mongodb-org
-```
 ## Usage
-### Development
 Make sure the service for the db runs by using `sudo service mongod start`.
-You can fill the database with mock values using the command `npm run populateDB`.
-To run a hot-reloading web server for development use  `npm run dev`. To access directly the mongo console if needed just use `mongo`.
 
-Your db server will be on localhost, the node server on the port displayed by your console!
+You may want to perform the DB operations 1 to 3 before starting (see below).
+
+The following commands are all defined using npm scripts from the package.json.
+
+All the backend servers are served by default at http://localhost:3000/.
+
+### Database operations
+1. `npm run initDB`: Fills the db with the data of the house (rooms).
+2. `npm run createTestUsers`: Fills the db with some test users whose data is [here](./scripts/scriptsUtils.js).
+3. `npm run fillEditions`: Fills the db with the editions' data.
+4. `npm run cleanDB`: Cleans the db by removing eventual test users and all the shotguns (leaving editions and rooms).
+5. `npm run cleanShotguns`: Cleans your db by removing only the shotguns.
+
+A developer would usually do 1 to 3 only once and often use 5 to re-start new shotgun combinations.
+
+### Development
+1. `npm run dev`: Hot-reloading web server for development.
+2. `npm run devStartShotgun`: The same as 1, but modified so that shotguns are possible even
+if the shotgun date is not reached.
+
 #### Prod
-`npm run start` will start a regular server, `npm run startShotgun` will start one which enables the shotgun
-whatever the shotgun date set in the db is.
+1. `npm run start` Starts a production server.

@@ -7,6 +7,7 @@ console.log("This script cleans the db of test users and shotguns.");
 let async = require("async");
 let User = require("../api/user/userModel");
 let Shotgun = require("../api/shotgun/shotgunModel");
+let Trip = require("../api/trip/tripModel");
 
 let mongoDB = scriptUtils.getMongoDbFromArgs();
 let mongooseConnection = scriptUtils.connectToDb(mongoDB);
@@ -18,6 +19,18 @@ let deleteShotguns = (cb) => {
                 return
             }
             console.log("Shotguns deleted.");
+            cb(null);
+        }
+    );
+};
+
+let deleteTrips = (cb) => {
+    Trip.deleteMany({}, (err) => {
+            if (err) {
+                cb(err, null);
+                return
+            }
+            console.log("Trips deleted.");
             cb(null);
         }
     );
@@ -49,8 +62,8 @@ let removeShotgunStatuses = (cb) => {
     })
 };
 
-const seriesWithUsers = [deleteShotguns, removeShotgunStatuses];
-const seriesWithoutUsers =     [...seriesWithUsers, removeTestUsers];
+const seriesWithUsers = [deleteShotguns, removeShotgunStatuses, deleteTrips];
+const seriesWithoutUsers = [...seriesWithUsers, removeTestUsers, deleteTrips];
 
 let series = process.argv.slice(2)[1] === "keepUsers" ? seriesWithUsers : seriesWithoutUsers;
 

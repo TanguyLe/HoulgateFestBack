@@ -20,6 +20,7 @@ let express = require("express"),
     editionRoutes = require('./api/edition/editionRoutes'),
     roomRoutes = require('./api/room/roomRoutes'),
     shotgunRoutes = require('./api/shotgun/shotgunRoutes'),
+    tripRoutes = require('./api/trip/tripRoutes'),
     contactRoutes = require('./api/contact/contactRoutes');
 
 scriptsUtils.connectToDb("mongodb://localhost/Userdb");
@@ -32,6 +33,7 @@ userRoutes(app);
 contactRoutes(app);
 app.use(middleware.userAuth);
 userRoutesWithAuth(app);
+tripRoutes(app);
 editionRoutes(app);
 app.use(middleware.hasStarted);
 roomRoutes(app);

@@ -3,5 +3,5 @@ let mongoose = require("mongoose"),
 
 
 exports.getTrips = (callback, errCallback = (() => {})) => {
-    Trip.find({}, {__v: 0}).then(callback).catch(errCallback)
+    Trip.find({}).then(callback).catch(errCallback)
 };

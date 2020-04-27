@@ -22,7 +22,10 @@ let createTrip = (date, location, seats, type, driver, passengers, cb) => {
     });
 
     trip.save((err) => {
-        if (err) {console.log(err); cb(err); return;}
+        if (err) {
+            cb(err);
+            return;
+        }
 
         console.log("New Trip the: " + trip.date);
         cb(null);
@@ -32,12 +35,20 @@ let createTrip = (date, location, seats, type, driver, passengers, cb) => {
 let usersList = [];
 
 let fetchUsers = (callback) => {
-    User.find({}, (err, res) => {usersList = res; callback(null);});
+    User.find({}, (err, res) => {
+        usersList = res;
+        callback(null);
+    });
 };
 
 let createTrips = (callback) => {
     async.parallel(scriptsUtils.testTrips.map(
-        (trip, index) => ((cb) => createTrip(...trip, usersList[index], [], cb))),
+        (trip, index) => ((cb) => createTrip(
+            ...trip,
+            usersList[index],
+            [usersList[index], usersList[index + 1]],
+            cb
+        ))),
         callback);
 };
 

@@ -11,7 +11,7 @@ let Trip = require("../api/trip/tripModel");
 let mongoDB = scriptsUtils.getMongoDbFromArgs();
 let mongooseConnection = scriptsUtils.connectToDb(mongoDB);
 
-let createTrip = (date, location, seats, type, driver, passengers, cb) => {
+const createTrip = (date, location, seats, type, driver, passengers, cb) => {
     let trip = new Trip({
         date: date,
         driver: driver,
@@ -32,27 +32,21 @@ let createTrip = (date, location, seats, type, driver, passengers, cb) => {
     });
 };
 
-let usersList = [];
+const fetchUsers = (callback) => User.find({}, callback);
 
-let fetchUsers = (callback) => {
-    User.find({}, (err, res) => {
-        usersList = res;
-        callback(null);
-    });
-};
-
-let createTrips = (callback) => {
+const createTrips = (users, callback) => {
     async.parallel(scriptsUtils.testTrips.map(
-        (trip, index) => ((cb) => createTrip(
-            ...trip,
-            usersList[index],
-            [usersList[index], usersList[index + 1]],
-            cb
-        ))),
+        (trip, index) => (
+            (cb) => createTrip(
+                ...trip,
+                users[index],
+                [users[index], users[index + 1]],
+                cb
+            ))),
         callback);
 };
 
-async.series([fetchUsers, createTrips],
+async.waterfall([fetchUsers, createTrips],
     (err) => {
         if (err)
             console.log("FINAL ERR: " + err);

@@ -29,5 +29,11 @@ module.exports = {
         ["Julie", "julie@julie.je", "test", true],
         ["Marie", "marie@marie.je", "test", true],
         ["Claire", "claire@claire.je", "test", true]
+    ],
+    testTrips: [
+        [new Date(), "Paris 18", 3, "BACK"],
+        [Date.parse('01 Jan 1970 00:45:00 GMT'), "Paris 18", 4, "BACK"],
+        [Date.parse('28 Jan 1979 15:30:00 GMT'), "Montélimart", 1, "FORTH"],
+        [Date.parse('05 Jan 1970 00:00:00 GMT'), "Châlons-sur-Saone", 6, "BACK"],
     ]
 };

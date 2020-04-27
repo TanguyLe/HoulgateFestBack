@@ -10,6 +10,7 @@ let express = require("express"),
     Shotgun = require('./api/shotgun/shotgunModel'),
     Edition = require('./api/edition/editionModel'),
     Mail = require('./api/mail/mailModel'),
+    Trip = require('./api/trip/tripModel'),
 
     middleware = require('./api/utils/middleware'),
     scriptsUtils = require("./scripts/scriptsUtils"),

@@ -29,9 +29,9 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 userRoutes(app);
+contactRoutes(app);
 app.use(middleware.userAuth);
 userRoutesWithAuth(app);
-contactRoutes(app);
 editionRoutes(app);
 app.use(middleware.hasStarted);
 roomRoutes(app);

@@ -10,6 +10,7 @@ let express = require("express"),
     Shotgun = require('./api/shotgun/shotgunModel'),
     Edition = require('./api/edition/editionModel'),
     Mail = require('./api/mail/mailModel'),
+    Trip = require('./api/trip/tripModel'),
 
     middleware = require('./api/utils/middleware'),
     scriptsUtils = require("./scripts/scriptsUtils"),
@@ -28,9 +29,9 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 userRoutes(app);
+contactRoutes(app);
 app.use(middleware.userAuth);
 userRoutesWithAuth(app);
-contactRoutes(app);
 editionRoutes(app);
 app.use(middleware.hasStarted);
 roomRoutes(app);

@@ -3,12 +3,11 @@ let mongoose = require("mongoose");
 
 module.exports = {
     getMongoDbFromArgs: () => {
-        console.log("Specifies database as argument - e.g.: populatedb mongodb://your_username:your_password@your_dabase_url");
-
         // Get arguments passed on command line
         let userArgs = process.argv.slice(2);
         if (!userArgs[0].startsWith("mongodb://"))
             throw "ERROR: You need to specify a valid mongodb URL as the first argument";
+        // mongodb://your_username:your_password@your_dabase_url
 
         return userArgs[0];
     },
@@ -20,6 +19,24 @@ module.exports = {
 
         return mongoose.connection
     },
+    getSaveCallback: (callback) =>
+        (err, object) => {
+            if (err) {
+                callback(err, null);
+                return
+            }
+            console.log("New object in the db: " + object.toString().replace(/\n/g, ""));
+            callback(null);
+        },
+    getMainCallback: (mongooseConnection) =>
+        (err) => {
+            if (err) {
+                console.log("DB Operation failed due to an error: " + err);
+            } else
+                console.log("DB Operation finished successfully, closing the connection.");
+            // All done, disconnect from database
+            mongooseConnection.close();
+        },
     testUsers: [
         ["Patrick", "Rothfuss@rothfuss.je", "test", true],
         ["Ben", "Bova@bova.je", "test", true],

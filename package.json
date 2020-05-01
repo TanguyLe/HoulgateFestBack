@@ -58,7 +58,6 @@
     "createTestUsers": "node scripts/createTestUsers.js mongodb://localhost/Userdb",
     "createTestTrips": "node scripts/createTestTrips.js mongodb://localhost/Userdb",
     "cleanShotguns": "node ./scripts/cleanDB.js mongodb://localhost/Userdb keepUsers",
-    "cleanDB": "node ./scripts/cleanDB.js mongodb://localhost/Userdb",
-    "fillEditions": "node ./scripts/fillEditions.js mongodb://localhost/Userdb"
+    "cleanDB": "node ./scripts/cleanDB.js mongodb://localhost/Userdb"
   }
 }

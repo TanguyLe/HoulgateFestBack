@@ -41,8 +41,8 @@ let createEditions = (callback) => {
                 year: editionDef.year,
                 weekendDate: editionDef.weekendDate,
                 shotgunDate: editionDef.shotgunDate
-            }).save(getSaveCallBack(cb)))
-        , callback);
+            }).save(getSaveCallBack(cb))
+        ), callback);
 };
 
 

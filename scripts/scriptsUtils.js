@@ -31,9 +31,9 @@ module.exports = {
     getMainCallback: (mongooseConnection) =>
         (err) => {
             if (err) {
-                console.log("DB Operation failed due to an error: " + err);
+                console.log("\nDB Operation failed due to an error: " + err);
             } else
-                console.log("DB Operation finished successfully, closing the connection.");
+                console.log("\nDB Operation finished successfully, closing the connection.");
             // All done, disconnect from database
             mongooseConnection.close();
         },

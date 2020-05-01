@@ -55,8 +55,6 @@
     "start": "node server.js",
     "initDB": "node ./scripts/initDB.js mongodb://localhost/Userdb",
     "createTestRecords": "node scripts/createTestRecords.js mongodb://localhost/Userdb",
-    "createTestUsers": "node scripts/createTestUsers.js mongodb://localhost/Userdb",
-    "createTestTrips": "node scripts/createTestTrips.js mongodb://localhost/Userdb",
     "cleanShotguns": "node ./scripts/cleanDB.js mongodb://localhost/Userdb keepUsers",
     "cleanDB": "node ./scripts/cleanDB.js mongodb://localhost/Userdb"
   }

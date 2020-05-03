@@ -1,6 +1,33 @@
 let mongoose = require("mongoose");
 
 
+const isFunction = (functionToCheck) => {
+    return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
+};
+
+const getSaveMessage = (schemaName, objStr) => `New ${schemaName} in the db: ${objStr}.`;
+const getDeleteMessage = (schemaName, objStr) => `${schemaName} removed from the db: ${objStr}.`;
+
+const getSingleOperationCallback = (label, callback, objectSerialize, messageFct) =>
+    (err, object) => {
+        if (err) {
+            callback(err, null);
+            return
+        }
+
+        let objStr;
+        if (objectSerialize)
+            if (isFunction(objectSerialize))
+                objStr = objectSerialize(object);
+            else
+                objStr = object[objectSerialize];
+        else
+            objStr = object.toString().replace(/\n/g, "");
+
+        console.log(messageFct(label, objStr));
+        callback(null);
+    };
+
 module.exports = {
     getMongoDbFromArgs: () => {
         // Get arguments passed on command line
@@ -19,13 +46,17 @@ module.exports = {
 
         return mongoose.connection
     },
-    getSaveCallback: (callback) =>
-        (err, object) => {
+    getSaveCallback: (label, callback, objectSerialize) =>
+        getSingleOperationCallback(label, callback, objectSerialize, getSaveMessage),
+    getRemoveCallback: (label, callback, objectSerialize) =>
+        getSingleOperationCallback(label, callback, objectSerialize, getDeleteMessage),
+    getDeleteManyCallback: (label, callback) =>
+        (err, result) => {
             if (err) {
                 callback(err, null);
                 return
             }
-            console.log("New object in the db: " + object.toString().replace(/\n/g, ""));
+            console.log(`${label} have been deleted if present, ${result.n} actual deletions.`);
             callback(null);
         },
     getMainCallback: (mongooseConnection) =>

@@ -26,13 +26,13 @@ The following commands are all defined using npm scripts from the package.json.
 All the backend servers are served by default at http://localhost:3000/.
 
 ### Database operations
-1. `npm run initDB`: Fills the db with the data of the house (rooms).
-2. `npm run createTestUsers`: Fills the db with some test users whose data is [here](./scripts/scriptsUtils.js).
-3. `npm run fillEditions`: Fills the db with the editions' data.
-4. `npm run cleanDB`: Cleans the db by removing eventual test users and all the shotguns (leaving editions and rooms).
-5. `npm run cleanShotguns`: Cleans your db by removing only the shotguns.
+1. `npm run initDB`: Fills the db with the data of the house (rooms) and the editions.
+To be executed only once (static data).
+2. `npm run createTestRecords`: Fills the db with some test records (users & trips) whose data is [here](./scripts/scriptsUtils.js).
+3. `npm run removeTestRecords`: Cleans the db by removing eventual test records (users, shotguns & trips from test users).
+4. `npm run removeTestShotguns`: Removes only test shotguns.
 
-A developer would usually do 1 to 3 only once and often use 5 to re-start new shotgun combinations.
+A developer would usually do 1 only once, sometimes 2-3 and often 4 to retry new shotgun combinations.
 
 ### Development
 1. `npm run dev`: Hot-reloading web server for development.

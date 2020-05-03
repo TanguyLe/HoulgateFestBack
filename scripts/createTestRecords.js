@@ -35,11 +35,11 @@ let createTestUsers = (callback) => {
     );
 };
 
-const createTrips = (callback) => {
+const createTestTrips = (callback) => {
     console.log("\nCreating test trips.");
 
     async.waterfall([
-            (cb) => User.find({}, cb),
+            (cb) => User.find({username: {$in: scriptsUtils.testUsers.map((user) => user[0])}}, cb),
             (users, cb) => async.parallel(
                 scriptsUtils.testTrips.map(
                     (trip, index) => (
@@ -59,4 +59,4 @@ const createTrips = (callback) => {
 
 };
 
-async.series([createTestUsers, createTrips], mainCallback);
+async.series([createTestUsers, createTestTrips], mainCallback);

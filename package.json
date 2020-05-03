@@ -55,6 +55,7 @@
     "start": "node server.js",
     "initDB": "node ./scripts/initDB.js mongodb://localhost/Userdb",
     "createTestRecords": "node scripts/createTestRecords.js mongodb://localhost/Userdb",
-    "removeTestRecords": "node ./scripts/removeTestRecords.js mongodb://localhost/Userdb"
+    "removeTestRecords": "node ./scripts/removeTestRecords.js mongodb://localhost/Userdb",
+    "removeTestShotguns": "node ./scripts/removeTestRecords.js mongodb://localhost/Userdb shotgunOnly"
   }
 }

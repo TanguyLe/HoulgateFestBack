@@ -69,10 +69,13 @@ const deleteTestUsers = (callback) => {
     );
 };
 
+const seriesFull = [
+    (cb) => async.parallel([deleteTestUsersShotguns, deleteTestUsersTrips], cb),
+    deleteTestUsers
+];
+
+
 async.series(
-    [
-        (cb) => async.parallel([deleteTestUsersShotguns, deleteTestUsersTrips], cb),
-        deleteTestUsers
-    ],
+    process.argv.slice(2)[1] === "shotgunOnly" ? [deleteTestUsersShotguns] : seriesFull,
     mainCallback
 );

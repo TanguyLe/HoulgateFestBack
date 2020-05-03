@@ -5,6 +5,8 @@ let async = require("async");
 let User = require("../api/user/userModel"),
     Trip = require("../api/trip/tripModel");
 
+let serializeTrip = require("../api/trip/tripController").serializeTrip;
+
 let passwordUtils = require("../api/utils/password"),
     scriptsUtils = require("./scriptsUtils"),
     mongoDB = scriptsUtils.getMongoDbFromArgs(),
@@ -18,6 +20,8 @@ console.log("This script populates the database with a few test records. (users 
 
 
 let createTestUsers = (callback) => {
+    console.log("\nCreating test users.");
+
     async.parallel(
         scriptsUtils.testUsers.map(
             user =>
@@ -26,13 +30,14 @@ let createTestUsers = (callback) => {
                     email: user[1],
                     password: passwordUtils.cryptPasswordSync(user[2]),
                     activated: user[3]
-                }).save(getSaveCallBack(cb))
+                }).save(getSaveCallBack("User", cb, "username"))
         ), callback
     );
 };
 
-
 const createTrips = (callback) => {
+    console.log("\nCreating test trips.");
+
     async.waterfall([
             (cb) => User.find({}, cb),
             (users, cb) => async.parallel(
@@ -45,7 +50,7 @@ const createTrips = (callback) => {
                             location: trip[1],
                             seats: trip[2],
                             type: trip[3]
-                        }).save(getSaveCallBack(cb))
+                        }).save(getSaveCallBack("Trip", cb, serializeTrip))
                     )
                 ), cb)
         ],

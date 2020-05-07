@@ -37,6 +37,11 @@ const createTrip = (req, res) => {
 const updateTrip = (req, res) => {
     tripController.updateTrip(req.params.tripId, req.body,
         trip => {
+            if (trip === null)
+                res.status(400).send({
+                    message: `Unable to find trip ${req.params.tripId}.`
+                });
+
             res.status(200).send({
                 meta: {
                     code: "200"
@@ -46,7 +51,7 @@ const updateTrip = (req, res) => {
         },
         err => {
             res.status(err.code || 500).send({
-                message: err.message || `An error occurred while updating trip:${req.params.tripId}`
+                message: err.message || `An error occurred while updating trip ${req.params.tripId}.`
             });
         });
 };
@@ -54,6 +59,11 @@ const updateTrip = (req, res) => {
 const deleteTrip = (req, res) => {
     tripController.deleteTrip(req.params.tripId,
         trip => {
+            if (trip === null)
+                res.status(400).send({
+                    message: `Unable to find trip ${req.params.tripId}.`
+                });
+
             res.status(200).send({
                 meta: {
                     code: "200"
@@ -63,7 +73,7 @@ const deleteTrip = (req, res) => {
         },
         err => {
             res.status(err.code || 500).send({
-                message: err.message || `An error occurred while deleting trip:${req.params.tripId}`
+                message: err.message || `An error occurred while deleting trip ${req.params.tripId}.`
             });
         });
 };

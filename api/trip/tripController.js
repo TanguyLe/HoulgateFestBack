@@ -27,5 +27,9 @@ exports.updateTrip = (tripId, tripData, callback, errCallback = (() => {})) => {
     Trip.findByIdAndUpdate(tripId, tripData, {new: true}).then(callback).catch(errCallback);
 };
 
+exports.deleteTrip = (tripId, callback, errCallback = (() => {})) => {
+    Trip.findByIdAndRemove(tripId).then(callback).catch(errCallback);
+};
+
 
 exports.serializeTrip = (trip) => `At ${trip.date} from ${trip.location}`;

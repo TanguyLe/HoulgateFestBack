@@ -34,8 +34,29 @@ const createTrip = (req, res) => {
 };
 
 
+const updateTrip = (req, res) => {
+    tripController.updateTrip(req.params.tripId, req.body,
+        trip => {
+            res.status(200).send({
+                meta: {
+                    code: "200"
+                },
+                data: trip
+            })
+        },
+        err => {
+            res.status(err.code || 500).send({
+                message: err.message || "Some error occurred while updating a trip."
+            });
+        });
+};
+
+
 module.exports = (app) => {
     app.route('/trip')
         .get(getTrips)
         .post(createTrip);
+
+    app.route("/trip/:tripId")
+        .put(updateTrip);
 };

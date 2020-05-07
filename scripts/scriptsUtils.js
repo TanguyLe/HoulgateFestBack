@@ -69,14 +69,14 @@ module.exports = {
             mongooseConnection.close();
         },
     testUsers: [
-        ["Patrick", "Rothfuss@rothfuss.je", "test", true],
-        ["Ben", "Bova@bova.je", "test", true],
-        ["Isaac", "Asimov@asimov.je", "test", true],
-        ["Bob", "bob@bob.je", "test", true],
-        ["Jim", "Jones@jones.je", "test", true],
-        ["Julie", "julie@julie.je", "test", true],
-        ["Marie", "marie@marie.je", "test", true],
-        ["Claire", "claire@claire.je", "test", true]
+        ["Patrick", "patrick", "test", true],
+        ["Ben", "ben", "test", true],
+        ["Isaac", "isaac", "test", true],
+        ["Bob", "bob", "test", true],
+        ["Jim", "jim", "test", true],
+        ["Julie", "julie", "test", true],
+        ["Marie", "marie", "test", true],
+        ["Claire", "claire", "test", true]
     ],
     testTrips: [
         [new Date(), "Paris 18", 3, "BACK"],

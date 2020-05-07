@@ -7,7 +7,7 @@ let Schema = mongoose.Schema;
 let roomSchema = new Schema(
     {
         type : {type:String, required: true, default: 'undefined'},
-        text: {type: String},
+        text: {type: String, unique: "All rooms need different names"},
         nbBeds: {type: Number, min: [0, 'No places'], required: true}
     },
     {

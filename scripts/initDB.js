@@ -1,59 +1,49 @@
 #! /usr/bin/env node
 
-
-let scriptsUtils = require("./scriptsUtils");
-console.log("This script populates initial necessary objects to the database.");
-
-
 let async = require("async");
-let Room = require("../api/room/roomModel");
 
-let babelCore = require("babel-core/register"),
-    bableFill = require("babel-polyfill"),
-    villaLesGenets = require("./villaLesGenetsDef.js");
+let Room = require("../api/room/roomModel"),
+    Edition = require("../api/edition/editionModel");
 
-let mongoDB = scriptsUtils.getMongoDbFromArgs();
-let mongooseConnection = scriptsUtils.connectToDb(mongoDB);
+let editions = require("./data/editionsDef.js"),
+    villaLesGenets = require("./data/villaLesGenetsDef.js");
 
-let createRoom = (roomType, text, nbBeds, cb) => {
-    let roomDetail = {
-        type: roomType,
-        text: text,
-        nbBeds: nbBeds
-    };
+let scriptsUtils = require("./scriptsUtils"),
+    mongoDB = scriptsUtils.getMongoDbFromArgs(),
+    mongooseConnection = scriptsUtils.connectToDb(mongoDB),
+    getSaveCallBack = scriptsUtils.getSaveCallback,
+    mainCallback = scriptsUtils.getMainCallback(mongooseConnection);
 
-    let room = new Room(roomDetail);
+console.log("This script populates initial necessary objects to the database (rooms & editions)." +
+            " It will fail if the DB is already filled or not accessible. \n");
 
-    room.save((err) => {
-            if (err) {
-                cb(err, null);
-                return
-            }
-            console.log("New Room: " + room.text);
-            cb(null);
-        }
-    );
-};
+let createRooms = (callback) => {
+    let stackCreateRooms = [];
 
-let createRooms = (cb) => {
-    let stackcreateRooms = [];
-
+    // For each floor and each room inside it we prepare a function to create it
     villaLesGenets.villaLesGenets.floors.forEach(
         (floor) => {
             floor.rooms.forEach((room) =>
-                    stackcreateRooms.push((callback) => createRoom(room.type, room.name, room.seats, callback))
+                stackCreateRooms.push(
+                    (cb) => new Room({type: room.type, text: room.name, nbBeds: room.seats}).save(getSaveCallBack(cb))
+                )
             )
         }
     );
-    async.parallel(stackcreateRooms, cb);
+    // And then they're executed in parallel
+    async.parallel(stackCreateRooms, callback);
+};
+
+let createEditions = (callback) => {
+    async.parallel(
+        editions.editions.map(editionDef =>
+            (cb) => new Edition({
+                year: editionDef.year,
+                weekendDate: editionDef.weekendDate,
+                shotgunDate: editionDef.shotgunDate
+            }).save(getSaveCallBack(cb))
+        ), callback);
 };
 
 
-async.series([createRooms],
-    (err) => {
-        if (err) {
-            console.log("FINAL ERR: " + err);
-        }
-        // All done, disconnect from database
-        mongooseConnection.close();
-    });
+async.parallel([createRooms, createEditions], mainCallback);

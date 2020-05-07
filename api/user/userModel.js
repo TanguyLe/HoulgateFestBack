@@ -1,5 +1,4 @@
 let mongoose = require("mongoose");
-const beautifyUnique = require("mongoose-beautiful-unique-validation");
 
 
 let UserSchema = new mongoose.Schema({
@@ -25,10 +24,6 @@ let UserSchema = new mongoose.Schema({
         required: true,
         default: false
     }
-});
-
-UserSchema.plugin(beautifyUnique, {
-    defaultMessage: "{PATH} existe déjà."
 });
 
 module.exports = mongoose.model("Users", UserSchema);

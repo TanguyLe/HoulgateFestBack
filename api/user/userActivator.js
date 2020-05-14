@@ -5,7 +5,7 @@ let mongo = require('mongodb'),
     User = mongoose.model("Users"),
     passwordUtils = require("../utils/password"),
     tokenUtils = require("../utils/token"),
-    emailConfig = require('../mail/emailConfig');
+    mailConfig = require('../mail/mailConfig');
 
 exports.activator = activator;
 
@@ -36,6 +36,6 @@ exports.config = {
     emailProperty: "email",
     signkey: tokenUtils.secret,
     from: "houlgatefest@gmail.com",
-    transport: nodemailer.createTransport(emailConfig.ACCOUNT_CONFIG),
+    transport: nodemailer.createTransport(mailConfig),
     templates: activator.templates.file(__dirname + "/templates")
 };

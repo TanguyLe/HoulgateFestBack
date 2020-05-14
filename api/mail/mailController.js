@@ -1,7 +1,5 @@
 let nodemailer = require('nodemailer'),
-    mongoose = require('mongoose'),
-    Mail = mongoose.model('Mails'),
-    emailConfig = require('./emailConfig');
+    mailConfig = require('./mailConfig');
 
 
 const enhanceText = (text) => {
@@ -12,7 +10,7 @@ exports.mailSender = (mailContent, cb, triedOnce) => {
     let STANDARD_VALUES = {};
     try {
         triedOnce = typeof triedOnce !== 'undefined' ? triedOnce : false;
-        let transporter = nodemailer.createTransport(emailConfig.ACCOUNT_CONFIG);
+        let transporter = nodemailer.createTransport(mailConfig);
         mailContent.html = enhanceText(mailContent.text);
         let mailOptions = Object.assign(STANDARD_VALUES, mailContent);
         transporter.sendMail(mailOptions, (error, info) => {
@@ -20,7 +18,7 @@ exports.mailSender = (mailContent, cb, triedOnce) => {
                 console.error(error);
                 return cb(error);
             }
-            transporter.close(); // pool is activated in emailConfig.js
+            transporter.close();
             if (info.rejected.length > 0) {
                 if (!triedOnce) {
                     // tries sending the email again in 1 minute with the rejected users list

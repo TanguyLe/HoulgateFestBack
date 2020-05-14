@@ -10,13 +10,81 @@ const getTrips = (req, res) => {
             })
         },
         err => {
-            res.status(500).send({
-                message: err.message || "Some error occurred while retrieving trips."
+            res.status(err.code || 500).send({
+                message: err.message || "An error occurred while retrieving trips."
             });
         });
 };
 
+const createTrip = (req, res) => {
+    tripController.createTrip(req.body,
+        trip => {
+            res.status(200).send({
+                meta: {
+                    code: "200"
+                },
+                data: trip
+            })
+        },
+        err => {
+            res.status(err.code || 500).send({
+                message: err.message || "An error occurred while creating a trip."
+            });
+        });
+};
+
+
+const updateTrip = (req, res) => {
+    tripController.updateTrip(req.params.tripId, req.body,
+        trip => {
+            if (trip === null)
+                res.status(400).send({
+                    message: `Unable to find trip ${req.params.tripId}.`
+                });
+
+            res.status(200).send({
+                meta: {
+                    code: "200"
+                },
+                data: trip
+            })
+        },
+        err => {
+            res.status(err.code || 500).send({
+                message: err.message || `An error occurred while updating trip ${req.params.tripId}.`
+            });
+        });
+};
+
+const deleteTrip = (req, res) => {
+    tripController.deleteTrip(req.params.tripId,
+        trip => {
+            if (trip === null)
+                res.status(400).send({
+                    message: `Unable to find trip ${req.params.tripId}.`
+                });
+
+            res.status(200).send({
+                meta: {
+                    code: "200"
+                },
+                data: trip
+            })
+        },
+        err => {
+            res.status(err.code || 500).send({
+                message: err.message || `An error occurred while deleting trip ${req.params.tripId}.`
+            });
+        });
+};
+
+
 module.exports = (app) => {
     app.route('/trip')
-        .get(getTrips);
+        .get(getTrips)
+        .post(createTrip);
+
+    app.route("/trip/:tripId")
+        .put(updateTrip)
+        .delete(deleteTrip);
 };

@@ -50,9 +50,9 @@
     "nodemailer": "^4.6.4"
   },
   "scripts": {
-    "dev": "nodemon server.js",
-    "devStartShotgun": "HAS_STARTED=1 nodemon server.js",
-    "start": "node server.js",
+    "dev": "FRONT_HOST=http://localhost:8000 nodemon server.js",
+    "devStartShotgun": "HAS_STARTED=1 FRONT_HOST=http://localhost:8000 nodemon server.js",
+    "start": "FRONT_HOST=http://www.houlgatefest.fr node server.js",
     "initDB": "node ./scripts/initDB.js mongodb://localhost/Userdb",
     "createTestRecords": "node scripts/createTestRecords.js mongodb://localhost/Userdb",
     "removeTestRecords": "node ./scripts/removeTestRecords.js mongodb://localhost/Userdb",

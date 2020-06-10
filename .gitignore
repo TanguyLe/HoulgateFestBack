@@ -17,4 +17,4 @@ package-lock.json
 *.min.js
 *.min.js.LICENSE
 *.min.js.LICENSE.txt
-/back/api/mail/emailConfig.js
+api/mail/mailConfig.js

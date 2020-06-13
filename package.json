@@ -25,6 +25,9 @@
       "email": "dejon.nicolas@gmail.com"
     }
   ],
+  "engines": {
+    "node": "12.13.1"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/TanguyLe/HoulgateFest.git"

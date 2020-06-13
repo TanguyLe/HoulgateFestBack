@@ -29,10 +29,17 @@ const getSingleOperationCallback = (label, callback, objectSerialize, messageFct
     };
 
 module.exports = {
-    getMongoDbFromArgs: () => {
+    getMongoDbFromEnvOrArgs: () => {
+        if ((process.env.NODE_ENV) === "production") {
+            if (process.env.MONGO_CONNECTION === undefined)
+                throw "ERROR: In a prod environment (NODE_ENV=production) you need to set MONGO_CONNECTION";
+
+            return process.env.MONGO_CONNECTION
+        }
         // Get arguments passed on command line
         let userArgs = process.argv.slice(2);
-        if (!userArgs[0].startsWith("mongodb://"))
+        console.log(userArgs)
+        if (!userArgs[0].startsWith("mongodb://") && !userArgs[0].startsWith("mongodb+srv://"))
             throw "ERROR: You need to specify a valid mongodb URL as the first argument";
         // mongodb://your_username:your_password@your_dabase_url
 

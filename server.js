@@ -22,7 +22,7 @@ let express = require("express"),
     tripRoutes = require('./api/trip/tripRoutes'),
     contactRoutes = require('./api/contact/contactRoutes');
 
-scriptsUtils.connectToDb("mongodb://localhost/Userdb");
+scriptsUtils.connectToDb(scriptsUtils.getMongoDbFromEnvOrArgs());
 
 app.use(cors());
 app.use(bodyParser.urlencoded({extended: true}));

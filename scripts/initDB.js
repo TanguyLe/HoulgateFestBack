@@ -9,7 +9,7 @@ let editions = require("./data/editionsDef.js"),
     villaLesGenets = require("./data/villaLesGenetsDef.js");
 
 let scriptsUtils = require("./scriptsUtils"),
-    mongoDB = scriptsUtils.getMongoDbFromArgs(),
+    mongoDB = scriptsUtils.getMongoDbFromEnvOrArgs(),
     mongooseConnection = scriptsUtils.connectToDb(mongoDB),
     getSaveCallBack = scriptsUtils.getSaveCallback,
     mainCallback = scriptsUtils.getMainCallback(mongooseConnection);

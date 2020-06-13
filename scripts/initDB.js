@@ -25,7 +25,7 @@ let createRooms = (callback) => {
         (floor) => {
             floor.rooms.forEach((room) =>
                 stackCreateRooms.push(
-                    (cb) => new Room({type: room.type, text: room.name, nbBeds: room.seats}).save(getSaveCallBack(cb))
+                    (cb) => new Room({type: room.type, text: room.name, nbBeds: room.seats}).save(getSaveCallBack("Room", cb, "text"))
                 )
             )
         }
@@ -41,7 +41,7 @@ let createEditions = (callback) => {
                 year: editionDef.year,
                 weekendDate: editionDef.weekendDate,
                 shotgunDate: editionDef.shotgunDate
-            }).save(getSaveCallBack(cb))
+            }).save(getSaveCallBack("Edition", cb, "year"))
         ), callback);
 };
 

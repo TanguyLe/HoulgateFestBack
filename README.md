@@ -11,7 +11,8 @@ It is meant to work alongside its frontend : https://github.com/TanguyLe/Houlgat
 1. Node and npm installed, recommended versions are node 12.13.1 and npm 6.12.1.
 2. Repo cloned.
 3. MongoDB installed and started, recommended version is 3.6.17. You can also use a remote mongodb.
-4. Get the credential files from the project's owner. (those are secret files not hosted on git)
+4. Get the email credential variables from the project's owner. You need a GMAIL_USER and a GMAIL_PASSWORD to
+use the emails (if you don't send any email, so no registration/activation/passwordReset/contact you're fine without them).
 
 ### Packages
 Just use `npm install` within the project directory and you're good to go !

@@ -11,6 +11,7 @@ const getDeleteMessage = (schemaName, objStr) => `${schemaName} removed from the
 const getSingleOperationCallback = (label, callback, objectSerialize, messageFct) =>
     (err, object) => {
         if (err) {
+            console.log(err.errmsg);
             callback(err, null);
             return
         }
@@ -34,7 +35,7 @@ module.exports = {
             if (process.env.MONGO_CONNECTION === undefined)
                 throw "ERROR: In a prod environment (NODE_ENV=production) you need to set MONGO_CONNECTION";
 
-            return process.env.MONGO_CONNECTION
+            return process.env.MONGO_CONNECTION;
         }
         // Get arguments passed on command line
         let userArgs = process.argv.slice(2);
@@ -60,8 +61,9 @@ module.exports = {
     getDeleteManyCallback: (label, callback) =>
         (err, result) => {
             if (err) {
+                console.log(err.errmsg);
                 callback(err, null);
-                return
+                return;
             }
             console.log(`${label} have been deleted if present, ${result.n} actual deletions.`);
             callback(null);

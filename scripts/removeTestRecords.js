@@ -28,16 +28,18 @@ const isTestShotgun = (shotgun) => testUsernames.includes(shotgun.user.username)
 const deleteTestUsersShotguns = (callback) => {
     console.log("\nDeleting test users' shotguns if any.");
 
-    async.waterfall([
+    async.waterfall(
+        [
             (cb) => Shotgun.find({}, cb).populate("user"),
             (shotguns, cb) => {
                 const testShotguns = shotguns.filter(shotgun => isTestShotgun(shotgun));
 
                 async.parallel(
-                    testShotguns.map(shotgun =>
-                        (cb => shotgun.remove(getRemoveCallback("Shotgun", cb)))
-                    ),
-                    cb)
+                    async.reflectAll(
+                        testShotguns.map(shotgun =>
+                            (cb => shotgun.remove(getRemoveCallback("Shotgun", cb)))
+                        )),
+                    cb);
             }
         ],
         callback
@@ -53,9 +55,11 @@ const deleteTestUsersTrips = (callback) => {
                 const testTrips = trips.filter(trip => isTestTrip(trip));
 
                 async.parallel(
-                    testTrips.map(trip => (cb => trip.remove(getRemoveCallback("Trip", cb, serializeTrip)))),
+                    async.reflectAll(
+                        testTrips.map(trip => (cb => trip.remove(getRemoveCallback("Trip", cb, serializeTrip))))
+                    ),
                     cb
-                )
+                );
             }
         ],
         callback
@@ -70,7 +74,7 @@ const deleteTestUsers = (callback) => {
 };
 
 const seriesFull = [
-    (cb) => async.parallel([deleteTestUsersShotguns, deleteTestUsersTrips], cb),
+    (cb) => async.parallel(async.reflectAll([deleteTestUsersShotguns, deleteTestUsersTrips]), cb),
     deleteTestUsers
 ];
 

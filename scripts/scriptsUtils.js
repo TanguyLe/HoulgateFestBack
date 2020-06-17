@@ -38,7 +38,7 @@ module.exports = {
         }
         // Get arguments passed on command line
         let userArgs = process.argv.slice(2);
-        console.log(userArgs)
+
         if (!userArgs[0].startsWith("mongodb://") && !userArgs[0].startsWith("mongodb+srv://"))
             throw "ERROR: You need to specify a valid mongodb URL as the first argument";
         // mongodb://your_username:your_password@your_dabase_url

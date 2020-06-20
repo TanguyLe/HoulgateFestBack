@@ -6,7 +6,7 @@ console.log("This script retrieves all the confirmed shotgun from the database")
 let async = require("async");
 let fs = require("fs");
 
-let mongoDB = scriptUtils.getMongoDbFromArgs();
+let mongoDB = scriptUtils.getMongoDbFromEnvOrArgs();
 let mongooseConnection = scriptUtils.connectToDb(mongoDB);
 
 let Shotgun = require("../api/shotgun/shotgunModel");

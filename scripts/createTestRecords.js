@@ -9,7 +9,7 @@ let serializeTrip = require("../api/trip/tripController").serializeTrip;
 
 let passwordUtils = require("../api/utils/password"),
     scriptsUtils = require("./scriptsUtils"),
-    mongoDB = scriptsUtils.getMongoDbFromArgs(),
+    mongoDB = scriptsUtils.getMongoDbFromEnvOrArgs(),
     mongooseConnection = scriptsUtils.connectToDb(mongoDB),
     getSaveCallBack = scriptsUtils.getSaveCallback,
     mainCallback = scriptsUtils.getMainCallback(mongooseConnection);

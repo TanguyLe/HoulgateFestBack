@@ -1,6 +1,6 @@
 let jwt = require("jsonwebtoken");
 
-let secret = "whodoyouthinkyouarehackingme";
+let secret = process.env.REFRESH_TOKEN_SECRET;
 let refreshTokens = {};
 
 let rand = () => {

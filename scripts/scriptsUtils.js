@@ -11,6 +11,7 @@ const getDeleteMessage = (schemaName, objStr) => `${schemaName} removed from the
 const getSingleOperationCallback = (label, callback, objectSerialize, messageFct) =>
     (err, object) => {
         if (err) {
+            console.log(err.errmsg);
             callback(err, null);
             return
         }
@@ -34,7 +35,7 @@ module.exports = {
             if (process.env.MONGO_CONNECTION === undefined)
                 throw "ERROR: In a prod environment (NODE_ENV=production) you need to set MONGO_CONNECTION";
 
-            return process.env.MONGO_CONNECTION
+            return process.env.MONGO_CONNECTION;
         }
         // Get arguments passed on command line
         let userArgs = process.argv.slice(2);
@@ -60,8 +61,9 @@ module.exports = {
     getDeleteManyCallback: (label, callback) =>
         (err, result) => {
             if (err) {
+                console.log(err.errmsg);
                 callback(err, null);
-                return
+                return;
             }
             console.log(`${label} have been deleted if present, ${result.n} actual deletions.`);
             callback(null);
@@ -86,7 +88,7 @@ module.exports = {
         ["Claire", "claire", "test", true]
     ],
     testTrips: [
-        [new Date(), "Paris 18", 3, "BACK"],
+        [Date.parse('09 Jun 2020 15:45:00 GMT'), "Paris 18", 3, "BACK"],
         [Date.parse('01 Jan 1970 00:45:00 GMT'), "Paris 18", 4, "BACK"],
         [Date.parse('28 Jan 1979 15:30:00 GMT'), "Montélimart", 1, "FORTH"],
         [Date.parse('05 Jan 1970 00:00:00 GMT'), "Châlons-sur-Saone", 6, "BACK"],

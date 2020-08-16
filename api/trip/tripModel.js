@@ -14,5 +14,6 @@ let TripSchema = new Schema(
         type: {type: mongoose.Schema.Types.String, enum: ["BACK", "FORTH"], required: true}
     }
 );
+TripSchema.index({date:1, driver:1}, { unique: true });
 
 module.exports = mongoose.model('Trips', TripSchema);

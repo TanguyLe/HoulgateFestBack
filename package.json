@@ -25,6 +25,9 @@
       "email": "dejon.nicolas@gmail.com"
     }
   ],
+  "engines": {
+    "node": "12.13.1"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/TanguyLe/HoulgateFest.git"
@@ -50,9 +53,9 @@
     "nodemailer": "^4.6.4"
   },
   "scripts": {
-    "dev": "nodemon server.js",
-    "devStartShotgun": "HAS_STARTED=1 nodemon server.js",
-    "start": "node server.js",
+    "dev": "FRONT_HOST=http://localhost:8000 nodemon server.js mongodb://localhost/Userdb",
+    "devStartShotgun": "HAS_STARTED=1 FRONT_HOST=http://localhost:8000 nodemon server.js mongodb://localhost/Userdb",
+    "start": "FRONT_HOST=http://www.houlgatefest.fr node server.js mongodb://localhost/Userdb",
     "initDB": "node ./scripts/initDB.js mongodb://localhost/Userdb",
     "createTestRecords": "node scripts/createTestRecords.js mongodb://localhost/Userdb",
     "removeTestRecords": "node ./scripts/removeTestRecords.js mongodb://localhost/Userdb",

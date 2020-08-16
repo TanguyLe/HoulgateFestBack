@@ -5,7 +5,6 @@ module.exports = (app) => {
     userActivator.activator.init(userActivator.config);
 
     app.route("/users")
-        .get(user.userList)
         .post(user.createUser, userActivator.activator.createActivate);
 
     app.route("/users/:user/activate")

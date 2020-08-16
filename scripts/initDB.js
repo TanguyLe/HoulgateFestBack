@@ -9,13 +9,13 @@ let editions = require("./data/editionsDef.js"),
     villaLesGenets = require("./data/villaLesGenetsDef.js");
 
 let scriptsUtils = require("./scriptsUtils"),
-    mongoDB = scriptsUtils.getMongoDbFromArgs(),
+    mongoDB = scriptsUtils.getMongoDbFromEnvOrArgs(),
     mongooseConnection = scriptsUtils.connectToDb(mongoDB),
     getSaveCallBack = scriptsUtils.getSaveCallback,
     mainCallback = scriptsUtils.getMainCallback(mongooseConnection);
 
 console.log("This script populates initial necessary objects to the database (rooms & editions)." +
-            " It will fail if the DB is already filled or not accessible. \n");
+    " It will fail if the DB is not accessible and log if a record is already present. \n");
 
 let createRooms = (callback) => {
     let stackCreateRooms = [];
@@ -25,25 +25,31 @@ let createRooms = (callback) => {
         (floor) => {
             floor.rooms.forEach((room) =>
                 stackCreateRooms.push(
-                    (cb) => new Room({type: room.type, text: room.name, nbBeds: room.seats}).save(getSaveCallBack(cb))
+                    (cb) => new Room({
+                        type: room.type,
+                        text: room.name,
+                        nbBeds: room.seats
+                    }).save(getSaveCallBack("Room", cb, "text"))
                 )
-            )
+            );
         }
     );
     // And then they're executed in parallel
-    async.parallel(stackCreateRooms, callback);
+    async.parallel(async.reflectAll(stackCreateRooms), callback);
 };
 
 let createEditions = (callback) => {
     async.parallel(
-        editions.editions.map(editionDef =>
-            (cb) => new Edition({
-                year: editionDef.year,
-                weekendDate: editionDef.weekendDate,
-                shotgunDate: editionDef.shotgunDate
-            }).save(getSaveCallBack(cb))
+        async.reflectAll(
+            editions.editions.map(editionDef =>
+                (cb) => new Edition({
+                    year: editionDef.year,
+                    weekendDate: editionDef.weekendDate,
+                    shotgunDate: editionDef.shotgunDate
+                }).save(getSaveCallBack("Edition", cb, "year"))
+            )
         ), callback);
 };
 
 
-async.parallel([createRooms, createEditions], mainCallback);
+async.parallel(async.reflectAll([createRooms, createEditions]), mainCallback);

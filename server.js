@@ -14,6 +14,7 @@ let express = require("express"),
     middleware = require('./api/utils/middleware'),
     scriptsUtils = require("./scripts/scriptsUtils"),
 
+    statusRoutes = require('./api/status/statusRoutes'),
     userRoutes = require('./api/user/userRoutes'),
     userRoutesWithAuth = require('./api/user/userRoutesWithAuth'),
     editionRoutes = require('./api/edition/editionRoutes'),
@@ -22,12 +23,13 @@ let express = require("express"),
     tripRoutes = require('./api/trip/tripRoutes'),
     contactRoutes = require('./api/contact/contactRoutes');
 
-scriptsUtils.connectToDb("mongodb://localhost/Userdb");
+scriptsUtils.connectToDb(scriptsUtils.getMongoDbFromEnvOrArgs());
 
 app.use(cors());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
+statusRoutes(app);
 userRoutes(app);
 contactRoutes(app);
 app.use(middleware.userAuth);

@@ -1,11 +1,11 @@
-let mongo = require('mongodb'),
+let mongo = require("mongodb"),
     mongoose = require("mongoose"),
-    nodemailer = require('nodemailer'),
-    activator = require('activator'),
+    nodemailer = require("nodemailer"),
+    activator = require("activator"),
     User = mongoose.model("Users"),
     passwordUtils = require("../utils/password"),
     tokenUtils = require("../utils/token"),
-    mailConfig = require('../mail/mailConfig');
+    mailConfig = require("../mail/mailConfig");
 
 exports.activator = activator;
 
@@ -14,22 +14,28 @@ exports.config = {
         find: (id, callback) => {
             User.findById(id, (err, user) => {
                 if (err) callback(err, null);
-
                 else if (!user) callback(null, null);
                 else {
-                    let res = {id: user.id, email: user.email};
+                    let res = { id: user.id, email: user.email };
 
                     callback(null, res);
                 }
-
             });
         },
         activate: (id, callback) => {
-            User.updateOne({"_id": new mongo.ObjectId(id)}, {$set: {activated: true}}, callback);
+            User.updateOne(
+                { _id: new mongo.ObjectId(id) },
+                { $set: { activated: true } },
+                callback
+            );
         },
         setPassword: (id, password, callback) => {
             passwordUtils.cryptPassword(password).then((resPassword) => {
-                User.updateOne({"_id": new mongo.ObjectId(id)}, {$set: {password: resPassword}}, callback);
+                User.updateOne(
+                    { _id: new mongo.ObjectId(id) },
+                    { $set: { password: resPassword } },
+                    callback
+                );
             });
         },
     },
@@ -37,5 +43,5 @@ exports.config = {
     signkey: tokenUtils.secret,
     from: "houlgatefest@gmail.com",
     transport: nodemailer.createTransport(mailConfig),
-    templates: activator.templates.file(__dirname + "/templates")
+    templates: activator.templates.file(__dirname + "/templates"),
 };

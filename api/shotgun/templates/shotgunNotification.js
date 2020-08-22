@@ -1,5 +1,6 @@
 exports.getShotgunNotificationContent = (owner, room, users) => {
-    return (`<head>
+    return (
+        `<head>
         <style>
         </style>
     </head>
@@ -9,9 +10,15 @@ exports.getShotgunNotificationContent = (owner, room, users) => {
     <p>
     Récapitulatif de ton shotgun:
         <ul>
-            <li>` + owner + ` a réservé la chambre ` + room + `</li>
+            <li>` +
+        owner +
+        ` a réservé la chambre ` +
+        room +
+        `</li>
             <li>Compagnons de chambre :
-                <ul> ` + users + `</ul>
+                <ul> ` +
+        users +
+        `</ul>
             </li>
         </ul>
         </p>
@@ -19,5 +26,6 @@ exports.getShotgunNotificationContent = (owner, room, users) => {
     <b>Merci et à bientôt!</b>
     <br/>
     <br/>
-    <i>Au cas où tu te poses la question c'est un message automatique, ça sert à rien de répondre banane.</i>`);
+    <i>Au cas où tu te poses la question c'est un message automatique, ça sert à rien de répondre banane.</i>`
+    );
 };

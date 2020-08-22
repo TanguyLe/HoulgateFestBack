@@ -13,9 +13,10 @@ jobs:
       with:
         # Make sure the actual branch is checked out when running on pull requests
         ref: ${{ github.head_ref }}
-
-    - name: Prettify code
-      uses: creyD/prettier_action@v3.0
+    - uses: actions/setup-node@v1
       with:
-        dry: "true"
-        prettier_options: --write .
+        node-version: "12.x"
+    - name: Format
+      run: |
+        npm ci
+        npm run prettier-check

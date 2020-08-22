@@ -42,6 +42,7 @@
     "nodemailer": "^4.6.4"
   },
   "scripts": {
+    "prettier-check": "prettier --check .",
     "dev": "FRONT_HOST=http://localhost:8000 nodemon server.js mongodb://localhost/Userdb",
     "devStartShotgun": "HAS_STARTED=1 FRONT_HOST=http://localhost:8000 nodemon server.js mongodb://localhost/Userdb",
     "start": "FRONT_HOST=http://www.houlgatefest.fr node server.js mongodb://localhost/Userdb",

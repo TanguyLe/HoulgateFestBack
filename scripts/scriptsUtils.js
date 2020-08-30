@@ -29,15 +29,15 @@ const getSingleOperationCallback = (label, callback, objectSerialize, messageFct
 
 module.exports = {
     getMongoDbUriFromEnv: () => {
-       if (process.env.MONGO_CONNECTION === undefined)
-           throw "ERROR: MONGO_CONNECTION env variable needs to be set.";
+        if (process.env.MONGO_CONNECTION === undefined)
+            throw "ERROR: MONGO_CONNECTION env variable needs to be set.";
 
-       const connectionURI = process.env.MONGO_CONNECTION;
+        const connectionURI = process.env.MONGO_CONNECTION;
 
         if (!connectionURI.startsWith("mongodb://") && !connectionURI.startsWith("mongodb+srv://"))
             throw "ERROR: You need to specify a valid mongodb URL in MONGO_CONNECTION.";
 
-       return connectionURI;
+        return connectionURI;
     },
     connectToDb: (mongoDBUri) => {
         mongoose.Promise = global.Promise;

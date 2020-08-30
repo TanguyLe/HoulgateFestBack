@@ -15,3 +15,6 @@ _book
 *.min.js
 *.min.js.LICENSE
 *.min.js.LICENSE.txt
+
+back-prod-env.env
+back-test-env.env

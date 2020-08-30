@@ -14,7 +14,7 @@ let randomToken = () => {
 exports.getJWTToken = (headers) => {
     if (!headers.authorization) return false;
 
-    let split = headers.authorization.split(' ');
+    let split = headers.authorization.split(" ");
 
     if (split[0] !== "JWT") return false;
 
@@ -22,7 +22,7 @@ exports.getJWTToken = (headers) => {
 };
 
 exports.generateAccessToken = (info = "random_shit") => {
-    return jwt.sign(info, secret, {expiresIn: "20m"});
+    return jwt.sign(info, secret, { expiresIn: "20m" });
 };
 
 exports.generateRefreshToken = (accessToken) => {
@@ -32,19 +32,19 @@ exports.generateRefreshToken = (accessToken) => {
 
     refreshTokens[accessToken] = refreshToken;
 
-    return refreshToken
+    return refreshToken;
 };
 
 exports.checkAccessToken = (accessToken, callbackFct, ignoreExpiration) => {
-    jwt.verify(accessToken, secret, {ignoreExpiration: ignoreExpiration}, callbackFct)
+    jwt.verify(accessToken, secret, { ignoreExpiration: ignoreExpiration }, callbackFct);
 };
 
 exports.checkIfAccessTokenExpired = (accessToken) => {
-    return (Date.now() / 1000) > jwt.decode(accessToken).exp;
+    return Date.now() / 1000 > jwt.decode(accessToken).exp;
 };
 
 exports.checkRefreshToken = (accessToken, refreshToken) => {
-    if (refreshTokens[accessToken] && (refreshTokens[accessToken] === refreshToken)) {
+    if (refreshTokens[accessToken] && refreshTokens[accessToken] === refreshToken) {
         delete refreshTokens[accessToken];
 
         return true;

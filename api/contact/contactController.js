@@ -1,5 +1,4 @@
-let mail = require('../mail/mailController');
-
+let mail = require("../mail/mailController");
 
 exports.send = (req, res) => {
     try {
@@ -7,9 +6,9 @@ exports.send = (req, res) => {
         let content = `Joignable au ${req.body.mailContent.phone}, ou par mel au ${req.body.mailContent.mail}.
             Contenu de la demande : ${req.body.mailContent.content}`;
         let mailContent = {
-            to: 'houlgatefest@gmail.com',
+            to: "houlgatefest@gmail.com",
             subject: title,
-            text: content
+            text: content,
         };
 
         mail.mailSender(mailContent, (err) => {
@@ -18,15 +17,17 @@ exports.send = (req, res) => {
                     meta: {
                         error_type: err.name || "Error 500 : Internal Server Error",
                         code: err.httpStatusCode || "500",
-                        error_message: err.message || "Some error occurred while sending contact request mail. Please retry later."
-                    }
+                        error_message:
+                            err.message ||
+                            "Some error occurred while sending contact request mail. Please retry later.",
+                    },
                 });
             }
             let contactAnswer = {
                 to: req.body.mailContent.mail,
                 subject: "Demande de contact reçue",
                 text: `Nous avons bien reçu votre demande. Ci-joint une copie du message envoyé : 
-                "${req.body.mailContent.content}"`
+                "${req.body.mailContent.content}"`,
             };
 
             mail.mailSender(contactAnswer, (err) => {
@@ -35,12 +36,14 @@ exports.send = (req, res) => {
                         meta: {
                             error_type: err.name || "Error 500 : Internal Server Error",
                             code: err.httpStatusCode || "500",
-                            error_message: err.message || "Some error occurred while sending contact answer mail."
-                        }
+                            error_message:
+                                err.message ||
+                                "Some error occurred while sending contact answer mail.",
+                        },
                     });
                 }
                 return res.sendStatus(200);
-            })
+            });
         });
     } catch (err) {
         console.error("Catch error :" + err);

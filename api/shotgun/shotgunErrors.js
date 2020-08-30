@@ -5,5 +5,5 @@ let getShotgunNotFoundError = (id) => {
 };
 
 module.exports = {
-    getShotgunNotFoundError: getShotgunNotFoundError
+    getShotgunNotFoundError: getShotgunNotFoundError,
 };

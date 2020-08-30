@@ -1,28 +1,16 @@
 {
   "name": "houlgatefestback",
-  "version": "1.0.0",
+  "version": "0.2.0",
   "description": "Back of the website for the HoulgateFest project",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "authors": [
-    {
-      "name": "Tanguy Le Floch",
-      "email": "lefloch.ta@gmail.com"
-    },
-    {
-      "name": "Gautier Barbereau",
-      "email": "gautier.barbereau@gmail.com"
-    },
-    {
-      "name": "Hugo Raynal",
-      "email": "raynalhugo@gmail.com"
-    },
-    {
-      "name": "Alexandre Vaast",
-      "email": "alex.vaast@gmail.com"
-    },
     {
       "name": "Nicolas Dejon",
       "email": "dejon.nicolas@gmail.com"
+    },
+    {
+      "name": "Tanguy Le Floch",
+      "email": "lefloch.ta@gmail.com"
     }
   ],
   "engines": {
@@ -30,7 +18,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/TanguyLe/HoulgateFest.git"
+    "url": "git@github.com:TanguyLe/HoulgateFestBack.git"
   },
   "main": "index.js",
   "devDependencies": {

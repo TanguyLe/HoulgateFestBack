@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 -   A MIT license [PR48](https://github.com/TanguyLe/HoulgateFestBack/pull/48)
+-   Prettier in the CI [MR50](https://github.com/TanguyLe/HoulgateFestBack/pull/50)
 
 ## [v0.2.0] 2020-04-15
 

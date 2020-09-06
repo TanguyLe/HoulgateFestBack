@@ -9,7 +9,7 @@ let User = require("../api/user/userModel"),
 let serializeTrip = require("../api/trip/tripController").serializeTrip;
 
 let scriptsUtils = require("./scriptsUtils"),
-    mongoDB = scriptsUtils.getMongoDbFromEnvOrArgs(),
+    mongoDB = scriptsUtils.getMongoDbUriFromEnv(),
     mongooseConnection = scriptsUtils.connectToDb(mongoDB),
     mainCallback = scriptsUtils.getMainCallback(mongooseConnection),
     getRemoveCallback = scriptsUtils.getRemoveCallback,

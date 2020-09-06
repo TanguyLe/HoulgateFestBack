@@ -12,9 +12,7 @@ It is meant to work alongside its frontend : https://github.com/TanguyLe/Houlgat
 
 1. Node and npm installed, recommended versions are node 12.13.1 and npm 6.12.1.
 2. Repo cloned.
-3. MongoDB installed and started, recommended version is 3.6.17. You can also use a remote mongodb.
-4. Get the email credential variables from the project's owner. You need a GMAIL_USER and a GMAIL_PASSWORD to
-   use the emails (if you don't send any email, so no registration/activation/passwordReset/contact you're fine without them).
+3. MongoDB installed and started, recommended version is 4.2. You can also use a remote mongodb.
 
 ### Packages
 
@@ -22,20 +20,31 @@ Just use `npm install` within the project directory and you're good to go !
 
 ## Usage
 
-If you use a local mongodb, make sure the service for the db runs by using `sudo service mongod start`.
+### Env variables setting
 
-By default, all the operations are performed to `mongodb://localhost/Userdb`. However, you can change the
-target db by two ways :
+All the scripts try to fetch their env variables from env files named as `back-<env>-env.env`
+(env being `dev`, `test` or `prod`).
+For `dev` scripts, those files are overridden by the env variables defined when running the script,
+for `test`/`prod` environments the files take the priority.
+So to set an env variable for all environments you can change the content of those files,
+and only in `dev` environments you can set them from outside.
 
-1. Dev setup : just change the `package.json` commands to put your
-   mongo connection string instead of `mongodb://localhost/Userdb`. Does not work if `NODE_ENV=production`.
-2. Prod setup : With `NODE_END=production` the connection must
-   be set in `MONGO_CONNECTION` env variable, regardless of what is in th command line.
+The `prod` and `test` env files are obviously not available on github,
+ask the project owner if you need them.
 
-You may want to perform the DB operations 1 to 3 before starting (see below).
+### Setup
+
+This part mostly apply to `dev` environments but would work the same for any.
+
+-   If you use a local mongodb, make sure the service for the db runs by using `sudo service mongod start`
+-   Set `MONGO_CONNECTION` at the mongo uri before running any script
+    (in `dev` the current value in the env file is `mongodb://localhost/Userdb`)
+-   If you plan to use emails, you have to set `GMAIL_USER` and `GMAIL_PASSWORD`
+
+You may want to perform the DB operations 1 to 3 before starting if you use a fresh db (see below).
 The following commands are all defined using npm scripts from the package.json.
 
-All the backend servers are served by default at http://localhost:3000/.
+All the backend servers are served by default at `http://localhost:3000/`.
 
 ### Database operations
 
@@ -49,12 +58,18 @@ All the backend servers are served by default at http://localhost:3000/.
 
 A developer would usually do 1 only once, sometimes 2-3 and often 4 to retry new shotgun combinations.
 
-### Development
+### Run
+
+#### `dev`
 
 1. `npm run dev`: Hot-reloading web server for development.
 2. `npm run devStartShotgun`: The same as 1, but modified so that shotguns are possible even
    if the shotgun date is not reached.
 
-#### Prod
+#### `prod`
 
-1. `npm run start` Starts a production server.
+1. `npm run start` Starts a production server on the prod environment
+
+#### `test`
+
+1. `npm run startTest` Starts a production server on the test environment

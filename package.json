@@ -23,6 +23,8 @@
     "main": "index.js",
     "devDependencies": {
         "babel-preset-es2015": "^6.24.1",
+        "cross-env": "^7.0.2",
+        "env-cmd": "^10.1.0",
         "nodemon": "^1.14.12",
         "prettier": "^2.0.5"
     },
@@ -43,12 +45,14 @@
     },
     "scripts": {
         "prettier-check": "prettier --check .",
-        "dev": "FRONT_HOST=http://localhost:8000 nodemon server.js mongodb://localhost/Userdb",
-        "devStartShotgun": "HAS_STARTED=1 FRONT_HOST=http://localhost:8000 nodemon server.js mongodb://localhost/Userdb",
-        "start": "FRONT_HOST=http://www.houlgatefest.fr node server.js mongodb://localhost/Userdb",
-        "initDB": "node ./scripts/initDB.js mongodb://localhost/Userdb",
-        "createTestRecords": "node scripts/createTestRecords.js mongodb://localhost/Userdb",
-        "removeTestRecords": "node ./scripts/removeTestRecords.js mongodb://localhost/Userdb",
-        "removeTestShotguns": "node ./scripts/removeTestRecords.js mongodb://localhost/Userdb shotgunOnly"
+        "prettier-run": "prettier --write .",
+        "dev": "env-cmd --no-override -f back-dev-env.env nodemon server.js",
+        "devStartShotgun": "cross-env-shell HAS_STARTED=1 npm run dev",
+        "start": "env-cmd -f back-prod-env.env --silent node server.js",
+        "startTest": "env-cmd -f back-test-env.env --silent node server.js",
+        "initDB": "env-cmd --no-override -f back-dev-env.env node ./scripts/initDB.js",
+        "createTestRecords": "env-cmd --no-override -f back-dev-env.env node scripts/createTestRecords.js",
+        "removeTestRecords": "env-cmd --no-override -f back-dev-env.env node ./scripts/removeTestRecords.js",
+        "removeTestShotguns": "env-cmd --no-override -f back-dev-env.env node ./scripts/removeTestRecords.js shotgunOnly"
     }
 }

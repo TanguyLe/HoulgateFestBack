@@ -10,7 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 -   A MIT license [PR48](https://github.com/TanguyLe/HoulgateFestBack/pull/48)
--   Prettier in the CI [MR50](https://github.com/TanguyLe/HoulgateFestBack/pull/50)
+-   Prettier in the CI [PR50](https://github.com/TanguyLe/HoulgateFestBack/pull/50)
+
+### Changed
+
+-   Env variables work on windows [PR51](https://github.com/TanguyLe/HoulgateFestBack/pull/51)
 
 ## [v0.2.0] 2020-04-15
 

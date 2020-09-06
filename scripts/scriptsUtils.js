@@ -28,27 +28,22 @@ const getSingleOperationCallback = (label, callback, objectSerialize, messageFct
 };
 
 module.exports = {
-    getMongoDbFromEnvOrArgs: () => {
-        if (process.env.NODE_ENV === "production") {
-            if (process.env.MONGO_CONNECTION === undefined)
-                throw "ERROR: In a prod environment (NODE_ENV=production) you need to set MONGO_CONNECTION";
+    getMongoDbUriFromEnv: () => {
+        if (process.env.MONGO_CONNECTION === undefined)
+            throw "ERROR: MONGO_CONNECTION env variable needs to be set.";
 
-            return process.env.MONGO_CONNECTION;
-        }
-        // Get arguments passed on command line
-        let userArgs = process.argv.slice(2);
+        const connectionURI = process.env.MONGO_CONNECTION;
 
-        if (!userArgs[0].startsWith("mongodb://") && !userArgs[0].startsWith("mongodb+srv://"))
-            throw "ERROR: You need to specify a valid mongodb URL as the first argument";
-        // mongodb://your_username:your_password@your_dabase_url
+        if (!connectionURI.startsWith("mongodb://") && !connectionURI.startsWith("mongodb+srv://"))
+            throw "ERROR: You need to specify a valid mongodb URL in MONGO_CONNECTION.";
 
-        return userArgs[0];
+        return connectionURI;
     },
-    connectToDb: (mongoDB) => {
+    connectToDb: (mongoDBUri) => {
         mongoose.Promise = global.Promise;
         mongoose.set("useCreateIndex", true);
         mongoose.connection.on("error", console.error.bind(console, "MongoDB connection error:"));
-        mongoose.connect(mongoDB, {
+        mongoose.connect(mongoDBUri, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });

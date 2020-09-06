@@ -84,6 +84,6 @@ const seriesFull = [
 ];
 
 async.series(
-    process.argv.slice(2)[1] === "shotgunOnly" ? [deleteTestUsersShotguns] : seriesFull,
+    process.argv.slice(2)[0] === "shotgunOnly" ? [deleteTestUsersShotguns] : seriesFull,
     mainCallback
 );

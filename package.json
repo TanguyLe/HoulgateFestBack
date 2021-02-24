@@ -51,8 +51,8 @@
         "start": "env-cmd -f back-prod-env.env --silent node server.js",
         "startTest": "env-cmd -f back-test-env.env --silent node server.js",
         "initDB": "env-cmd --no-override -f back-dev-env.env node ./scripts/initDB.js",
-        "createTestRecords": "env-cmd --no-override -f back-dev-env.env node scripts/createTestRecords.js",
-        "removeTestRecords": "env-cmd --no-override -f back-dev-env.env node ./scripts/removeTestRecords.js",
-        "removeTestShotguns": "env-cmd --no-override -f back-dev-env.env node ./scripts/removeTestRecords.js shotgunOnly"
+        "createTestRecords": "env-cmd --no-override -f back-test-env.env node scripts/createTestRecords.js",
+        "removeTestRecords": "env-cmd --no-override -f back-test-env.env node ./scripts/removeTestRecords.js",
+        "removeTestShotguns": "env-cmd --no-override -f back-test-env.env node ./scripts/removeTestRecords.js shotgunOnly"
     }
 }

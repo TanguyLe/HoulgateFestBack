@@ -63,6 +63,15 @@ module.exports = {
         console.log(`${label} have been deleted if present, ${result.n} actual deletions.`);
         callback(null);
     },
+    getUpdateManyCallback: (label, callback) => (err, result) => {
+        if (err) {
+            console.log(err.errmsg);
+            callback(err, null);
+            return;
+        }
+        console.log(`${label} have been updated if present, ${result.nModified} actual updates.`);
+        callback(null);
+    },
     getMainCallback: (mongooseConnection) => (err) => {
         if (err) {
             console.log("\nDB Operation failed due to an error: " + err);

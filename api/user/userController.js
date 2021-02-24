@@ -47,7 +47,16 @@ exports.createUser = (req, res, next) => {
 
         let newUser = new User(newUserInfo);
         newUser.save((err, user) => {
-            if (err) res.send(err);
+            if (err)
+                res.json({
+                    errors: {
+                        [Object.keys(err.keyValue)[0]]: {
+                            message: `This ${
+                                Object.keys(err.keyValue)[0]
+                            } is most likely already taken, try another.`,
+                        },
+                    },
+                });
             else {
                 fillUserAndTokens(user, res);
                 req.activator = { id: user.id };

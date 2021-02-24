@@ -19,8 +19,8 @@ let scriptsUtils = require("./scriptsUtils"),
 
 console.log(
     "This script cleans the database from the test records. " +
-    "(test users, test trips and test user's shotguns)." +
-    " It will fail if the DB is not accessible. \n"
+        "(test users, test trips and test user's shotguns)." +
+        " It will fail if the DB is not accessible. \n"
 );
 
 const isTestTrip = (trip) => testUsernames.includes(trip.driver.username);
@@ -44,18 +44,20 @@ const deleteTestUsersShotguns = (callback) => {
                     cb
                 );
             },
-            (_, cb) => User.updateMany(
-                {username: {$in: testUsernames}},
-                {
-                    $set: {
-                        hasShotgun: false,
-                        hasPreShotgun: false,
-                        room: null
-                    }
-                },
-                getUpdateManyCallback("\nTest users " + testUsernames.join(", "), cb)
-            )
-        ], callback
+            (_, cb) =>
+                User.updateMany(
+                    { username: { $in: testUsernames } },
+                    {
+                        $set: {
+                            hasShotgun: false,
+                            hasPreShotgun: false,
+                            room: null,
+                        },
+                    },
+                    getUpdateManyCallback("\nTest users " + testUsernames.join(", "), cb)
+                ),
+        ],
+        callback
     );
 };
 
@@ -84,7 +86,7 @@ const deleteTestUsersTrips = (callback) => {
 
 const deleteTestUsers = (callback) => {
     User.deleteMany(
-        {username: {$in: testUsernames}},
+        { username: { $in: testUsernames } },
         getDeleteManyCallback("\nTest users " + testUsernames.join(", "), callback)
     );
 };
@@ -93,7 +95,6 @@ const seriesFull = [
     (cb) => async.parallel(async.reflectAll([deleteTestUsersShotguns, deleteTestUsersTrips]), cb),
     deleteTestUsers,
 ];
-
 
 async.series(
     process.argv.slice(2).includes("shotgunOnly") ? [deleteTestUsersShotguns] : seriesFull,

@@ -14,6 +14,7 @@ let scriptsUtils = require("./scriptsUtils"),
     mainCallback = scriptsUtils.getMainCallback(mongooseConnection),
     getRemoveCallback = scriptsUtils.getRemoveCallback,
     getDeleteManyCallback = scriptsUtils.getDeleteManyCallback,
+    getUpdateManyCallback = scriptsUtils.getUpdateManyCallback,
     testUsernames = scriptsUtils.testUsers.map((user) => user[0]);
 
 console.log(
@@ -43,6 +44,18 @@ const deleteTestUsersShotguns = (callback) => {
                     cb
                 );
             },
+            (_, cb) =>
+                User.updateMany(
+                    { username: { $in: testUsernames } },
+                    {
+                        $set: {
+                            hasShotgun: false,
+                            hasPreShotgun: false,
+                            room: null,
+                        },
+                    },
+                    getUpdateManyCallback("\nTest users " + testUsernames.join(", "), cb)
+                ),
         ],
         callback
     );
@@ -84,6 +97,6 @@ const seriesFull = [
 ];
 
 async.series(
-    process.argv.slice(2)[0] === "shotgunOnly" ? [deleteTestUsersShotguns] : seriesFull,
+    process.argv.slice(2).includes("shotgunOnly") ? [deleteTestUsersShotguns] : seriesFull,
     mainCallback
 );

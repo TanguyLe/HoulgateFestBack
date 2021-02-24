@@ -63,6 +63,15 @@ module.exports = {
         console.log(`${label} have been deleted if present, ${result.n} actual deletions.`);
         callback(null);
     },
+    getUpdateManyCallback: (label, callback) => (err, result) => {
+        if (err) {
+            console.log(err.errmsg);
+            callback(err, null);
+            return;
+        }
+        console.log(`${label} have been updated if present, ${result.nModified} actual updates.`);
+        callback(null);
+    },
     getMainCallback: (mongooseConnection) => (err) => {
         if (err) {
             console.log("\nDB Operation failed due to an error: " + err);
@@ -79,6 +88,18 @@ module.exports = {
         ["Julie", "julie", "test", true],
         ["Marie", "marie", "test", true],
         ["Claire", "claire", "test", true],
+        ["Isaac2", "isaac2", "test", true],
+        ["Bob2", "bob2", "test", true],
+        ["Jim2", "jim2", "test", true],
+        ["Julie2", "julie2", "test", true],
+        ["Marie2", "marie2", "test", true],
+        ["Claire2", "claire2", "test", true],
+        ["Isaac3", "isaac3", "test", true],
+        ["Bob3", "bob3", "test", true],
+        ["Jim3", "jim3", "test", true],
+        ["Julie3", "julie3", "test", true],
+        ["Marie3", "marie3", "test", true],
+        ["Claire3", "claire3", "test", true],
     ],
     testTrips: [
         [Date.parse("09 Jun 2020 15:45:00 GMT"), "Paris 18", 3, "BACK"],

@@ -79,6 +79,12 @@ module.exports = {
         ["Julie", "julie", "test", true],
         ["Marie", "marie", "test", true],
         ["Claire", "claire", "test", true],
+        ["Isaac2", "isaac2", "test", true],
+        ["Bob2", "bob2", "test", true],
+        ["Jim2", "jim2", "test", true],
+        ["Julie2", "julie2", "test", true],
+        ["Marie2", "marie2", "test", true],
+        ["Claire2", "claire2", "test", true],
     ],
     testTrips: [
         [Date.parse("09 Jun 2020 15:45:00 GMT"), "Paris 18", 3, "BACK"],

@@ -8,13 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-
 -   A MIT license [PR48](https://github.com/TanguyLe/HoulgateFestBack/pull/48)
 -   Prettier in the CI [PR50](https://github.com/TanguyLe/HoulgateFestBack/pull/50)
 
 ### Changed
-
 -   Env variables work on windows [PR51](https://github.com/TanguyLe/HoulgateFestBack/pull/51)
+-   Doubling the test users by suffixing '2' to the existing ones
+ [PR56](https://github.com/TanguyLe/HoulgateFestBack/pull/56)
+
 
 ## [v0.2.0] 2020-08-16
 

@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 -   Env variables work on windows [PR51](https://github.com/TanguyLe/HoulgateFestBack/pull/51)
--   Doubling the test users by suffixing '2' to the existing ones
+-   Tripling the test users by suffixing '2' and '3' to the existing ones
  [PR56](https://github.com/TanguyLe/HoulgateFestBack/pull/56)
 
 

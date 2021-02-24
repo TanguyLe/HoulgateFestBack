@@ -20,6 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   Correcting the cleaning script that is supposed to delete only the shotguns to update the
     users correctly [PR56](https://github.com/TanguyLe/HoulgateFestBack/pull/56)
 
+### Fixed
+
+-   The response for errors in the registration form is as expected [PR61](https://github.com/TanguyLe/HoulgateFestBack/pull/61)
+
 ## [v0.2.0] 2020-08-16
 
 ### Added

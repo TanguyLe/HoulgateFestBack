@@ -81,9 +81,7 @@ exports.afterCompleteShotgun = (shotgun) => {
         let content = shotgunNotification.getShotgunNotificationContent(
             userOwner.username,
             room.text,
-            users.map(
-                (item) => item.username).filter((username) => username !== userOwner.username
-            )
+            users.map((item) => item.username).filter((username) => username !== userOwner.username)
         );
 
         // send mail to all users

@@ -145,7 +145,7 @@ exports.shotgunCreatePost = (req, res) => {
             console.log("... Shotgun is created.");
 
             // set a timeout that checks after a certain time if the created shotgun has been finalised in the meantime
-            timeout.setTimeout(shotgun);
+            timeout.setShotgunTimeout(shotgun);
 
             return res.status(200).send({
                 meta: {
@@ -246,7 +246,7 @@ exports.shotgunDelete = (req, res) => {
                     if (!deletedShotgun)
                         return callback(shotgunErrors.getShotgunNotFoundError(req.params.roomId));
                     console.log("... Shotgun successfully deleted.");
-                    timeout.clearTimeout(deletedShotgun); // remove timeout set when the shotgun was created
+                    timeout.clearShotgunTimeout(deletedShotgun); // remove timeout set when the shotgun was created
                     callback(null, deletedShotgun);
                 });
             },
@@ -445,7 +445,7 @@ exports.roommatesAdd = (req, res, next) => {
                         },
                     });
             }
-
+            timeout.clearShotgunTimeout(shotgun);
             shotgunComplete.afterCompleteShotgun(shotgun);
 
             res.send({

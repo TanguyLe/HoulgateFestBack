@@ -9,17 +9,17 @@ let mongoose = require("mongoose"),
 let tuttimer = {};
 
 // Set a timeout of 5 min linked to a shotgun
-exports.setTimeout = (shotgun) => {
-    tuttimer[shotgun._id] = setTimeout(this.timeoutTriggered.bind(null, shotgun), 120000);
+exports.setShotgunTimeout = (shotgun) => {
+    tuttimer[shotgun._id] = setTimeout(this.shotgunTimeoutTriggered.bind(null, shotgun), 120000);
 };
 
 // Clear a timeout related to a shotgun
-exports.clearTimeout = (shotgun) => {
+exports.clearShotgunTimeout = (shotgun) => {
     clearTimeout(tuttimer[shotgun._id]);
 };
 
 // Delete shotgun not completed after a timeout
-exports.timeoutTriggered = (shotgun) => {
+exports.shotgunTimeoutTriggered = (shotgun) => {
     console.log("Timeout triggered for shotgun on room " + shotgun.room._id);
 
     // check if shotgun exists and delete it if shotgun is not completed

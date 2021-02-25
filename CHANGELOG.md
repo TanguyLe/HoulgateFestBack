@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 -   The response for errors in the registration form is as expected [PR61](https://github.com/TanguyLe/HoulgateFestBack/pull/61)
+-   The display of the email template on successful shotgun and its timing [PR62](https://github.com/TanguyLe/HoulgateFestBack/pull/62)
 
 ## [v0.2.0] 2020-08-16
 

@@ -76,9 +76,6 @@ exports.timeoutTriggered = (shotgun) => {
                     console.log("...shotgun on room " + shotgun.room + " deleted.");
                 }
             );
-        } else {
-            console.log("...shotgun is done after timeout.");
-            shotgunComplete.afterCompleteShotgun(shotgun);
         }
     });
 };

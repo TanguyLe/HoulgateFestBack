@@ -446,6 +446,8 @@ exports.roommatesAdd = (req, res, next) => {
                     });
             }
 
+            shotgunComplete.afterCompleteShotgun(shotgun);
+
             res.send({
                 meta: {
                     code: "200",

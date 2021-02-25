@@ -77,16 +77,13 @@ exports.afterCompleteShotgun = (shotgun) => {
         users.push(userOwner);
         let room = populatedShotgun.room;
 
-        let usersList = [];
-        users.forEach((item) => {
-            usersList.push("<li>" + item.username + "</li>");
-        });
-
         let title = `Shotgun terminé !`;
         let content = shotgunNotification.getShotgunNotificationContent(
             userOwner.username,
             room.text,
-            usersList
+            users.map(
+                (item) => item.username).filter((username) => username !== userOwner.username
+            )
         );
 
         // send mail to all users

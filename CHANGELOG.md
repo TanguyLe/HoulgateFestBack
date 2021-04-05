@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+-   Add more test trips and removing the type attribute [PR64](https://github.com/TanguyLe/HoulgateFestBack/pull/64)
 -   Env variables work on windows [PR51](https://github.com/TanguyLe/HoulgateFestBack/pull/51)
 -   Tripling the test users by suffixing '2' and '3' to the existing ones
     [PR56](https://github.com/TanguyLe/HoulgateFestBack/pull/56)

@@ -17,7 +17,7 @@ let TripSchema = new Schema({
         ref: "Users",
         required: true,
     },
-    passengers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Users" }]
+    passengers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Users" }],
 });
 TripSchema.index({ date: 1, driver: 1 }, { unique: true });
 

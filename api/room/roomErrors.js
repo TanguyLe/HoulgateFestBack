@@ -5,5 +5,5 @@ let getRoomNotFoundError = (id) => {
 };
 
 module.exports = {
-    getRoomNotFoundError: getRoomNotFoundError
+    getRoomNotFoundError: getRoomNotFoundError,
 };

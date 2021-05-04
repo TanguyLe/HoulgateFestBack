@@ -1,15 +1,14 @@
-let nodemailer = require('nodemailer'),
-    mailConfig = require('./mailConfig');
-
+let nodemailer = require("nodemailer"),
+    mailConfig = require("./mailConfig");
 
 const enhanceText = (text) => {
-    return '<b>' + text + '</b>';
+    return "<b>" + text + "</b>";
 };
 
 exports.mailSender = (mailContent, cb, triedOnce) => {
     let STANDARD_VALUES = {};
     try {
-        triedOnce = typeof triedOnce !== 'undefined' ? triedOnce : false;
+        triedOnce = typeof triedOnce !== "undefined" ? triedOnce : false;
         let transporter = nodemailer.createTransport(mailConfig);
         mailContent.html = enhanceText(mailContent.text);
         let mailOptions = Object.assign(STANDARD_VALUES, mailContent);
@@ -24,17 +23,16 @@ exports.mailSender = (mailContent, cb, triedOnce) => {
                     // tries sending the email again in 1 minute with the rejected users list
                     mailContent.to = info.rejected;
                     setTimeout(this.timeoutTriggered.bind(null, mailContent, cb), 1000);
-                }
-                else {
-                    let error = new Error("Email sending to " + mailContent.to + " failed after retry.");
+                } else {
+                    let error = new Error(
+                        "Email sending to " + mailContent.to + " failed after retry."
+                    );
                     error.name = "Error 500 : Internal Server Error";
                     error.httpStatusCode = "500";
                     cb(error);
                 }
-            }
-            else return cb(false);
+            } else return cb(false);
         });
-
     } catch (err) {
         console.error("Catch error: " + err);
         return cb(err);
@@ -43,12 +41,22 @@ exports.mailSender = (mailContent, cb, triedOnce) => {
 
 // Sending mail again after a timeout
 exports.timeoutTriggered = (mailContent, callback) => {
-    this.mailSender(mailContent, (err) => {
-        if (err) {
-            console.error("Email sending to " + mailContent.to + " with subject " + mailContent.subject + " failed.");
-            return callback(err);
-        }
-        console.log("Email successfully sent to " + mailContent.to + ".");
-        return callback(false);
-    }, true); // set to true in order to indicate a second trial
+    this.mailSender(
+        mailContent,
+        (err) => {
+            if (err) {
+                console.error(
+                    "Email sending to " +
+                        mailContent.to +
+                        " with subject " +
+                        mailContent.subject +
+                        " failed."
+                );
+                return callback(err);
+            }
+            console.log("Email successfully sent to " + mailContent.to + ".");
+            return callback(false);
+        },
+        true
+    ); // set to true in order to indicate a second trial
 };

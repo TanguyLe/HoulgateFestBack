@@ -5,5 +5,5 @@ let getUserNotFoundError = (param_name, id) => {
 };
 
 module.exports = {
-    getUserNotFoundError: getUserNotFoundError
+    getUserNotFoundError: getUserNotFoundError,
 };

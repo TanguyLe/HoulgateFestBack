@@ -29,7 +29,7 @@
     },
     "dependencies": {
         "activator": "^3.0.2",
-        "async": "^2.6.0",
+        "async": "^2.6.4",
         "babel-cli": "^6.26.0",
         "babel-core": "^6.26.3",
         "babel-polyfill": "^6.26.0",

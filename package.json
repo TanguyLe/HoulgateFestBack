@@ -29,19 +29,19 @@
     },
     "dependencies": {
         "activator": "^3.0.2",
-        "async": "^2.6.0",
+        "async": "^2.6.4",
         "babel-cli": "^6.26.0",
         "babel-core": "^6.26.3",
         "babel-polyfill": "^6.26.0",
         "babel-preset-node6": "^11.0.0",
-        "bcrypt": "^5.0.0",
-        "body-parser": "^1.18.2",
+        "bcrypt": "^5.1.0",
+        "body-parser": "^1.20.2",
         "cors": "^2.8.4",
         "env-cmd": "^10.1.0",
-        "express": "^4.16.3",
+        "express": "^4.18.2",
         "jsonwebtoken": "^8.1.1",
-        "mongoose": "^5.0.12",
-        "nodemailer": "^6.4.18"
+        "mongoose": "^5.13.16",
+        "nodemailer": "^6.9.1"
     },
     "scripts": {
         "prettier-check": "prettier --check .",
@@ -51,8 +51,8 @@
         "start": "env-cmd -f back-prod-env.env --silent node server.js",
         "startTest": "env-cmd -f back-test-env.env --silent node server.js",
         "initDB": "env-cmd --no-override -f back-dev-env.env node ./scripts/initDB.js",
-        "createTestRecords": "env-cmd --no-override -f back-dev-env.env node scripts/createTestRecords.js",
-        "removeTestRecords": "env-cmd --no-override -f back-dev-env.env node ./scripts/removeTestRecords.js",
-        "removeTestShotguns": "env-cmd --no-override -f back-dev-env.env node ./scripts/removeTestRecords.js shotgunOnly"
+        "createTestRecords": "env-cmd --no-override -f back-test-env.env node scripts/createTestRecords.js",
+        "removeTestRecords": "env-cmd --no-override -f back-test-env.env node ./scripts/removeTestRecords.js",
+        "removeTestShotguns": "env-cmd --no-override -f back-test-env.env node ./scripts/removeTestRecords.js shotgunOnly"
     }
 }

@@ -102,9 +102,13 @@ module.exports = {
         ["Claire3", "claire3", "test", true],
     ],
     testTrips: [
-        [Date.parse("09 Jun 2020 15:45:00 GMT"), "Paris 18", 3, "BACK"],
-        [Date.parse("01 Jan 1970 00:45:00 GMT"), "Paris 18", 4, "BACK"],
-        [Date.parse("28 Jan 1979 15:30:00 GMT"), "Montélimart", 1, "FORTH"],
-        [Date.parse("05 Jan 1970 00:00:00 GMT"), "Châlons-sur-Saone", 6, "BACK"],
+        [Date.parse("09 Jun 2020 15:45:00 GMT"), "Paris 18", 3],
+        [Date.parse("01 Jan 1970 00:45:00 GMT"), "Paris 18", 4],
+        [Date.parse("28 Jan 1979 15:30:00 GMT"), "Montélimart", 1],
+        [Date.parse("05 Jan 1970 00:00:00 GMT"), "Châlons-sur-Saone", 6],
+        [Date.parse("09 Jun 2021 15:45:00 GMT"), "Paris 18", 2],
+        [Date.parse("12 May 2021 15:45:00 GMT"), "Paris 12", 5],
+        [Date.parse("28 May 2021 16:00:00 GMT"), "Marseille", 1],
+        [Date.parse("04 Jun 2021 00:00:00 GMT"), "Yolocity", 4],
     ],
 };

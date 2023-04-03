@@ -18,11 +18,6 @@ let TripSchema = new Schema({
         required: true,
     },
     passengers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Users" }],
-    type: {
-        type: mongoose.Schema.Types.String,
-        enum: ["BACK", "FORTH"],
-        required: true,
-    },
 });
 TripSchema.index({ date: 1, driver: 1 }, { unique: true });
 

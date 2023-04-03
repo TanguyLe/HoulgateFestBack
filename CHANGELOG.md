@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 -   A MIT license [PR48](https://github.com/TanguyLe/HoulgateFestBack/pull/48)
 -   Prettier in the CI [PR50](https://github.com/TanguyLe/HoulgateFestBack/pull/50)
+-   A script to historize shotguns [PR79](https://github.com/TanguyLe/HoulgateFestBack/pull/79)
 
 ### Changed
 

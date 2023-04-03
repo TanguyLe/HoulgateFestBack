@@ -55,6 +55,7 @@ All the backend servers are served by default at `http://localhost:3000/`.
 3. `npm run removeTestRecords`: Cleans the db by removing eventual
    test records (users, shotguns & trips from test users).
 4. `npm run removeTestShotguns`: Removes only test shotguns.
+5. `npm run historizeShotguns`: To remove actual shotguns and historize them.
 
 A developer would usually do 1 only once, sometimes 2-3 and often 4 to retry new shotgun combinations.
 

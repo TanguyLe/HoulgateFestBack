@@ -53,6 +53,7 @@
         "initDB": "env-cmd --no-override -f back-dev-env.env node ./scripts/initDB.js",
         "createTestRecords": "env-cmd --no-override -f back-dev-env.env node scripts/createTestRecords.js",
         "removeTestRecords": "env-cmd --no-override -f back-dev-env.env node ./scripts/removeTestRecords.js",
-        "removeTestShotguns": "env-cmd --no-override -f back-dev-env.env node ./scripts/removeTestRecords.js shotgunOnly"
+        "removeTestShotguns": "env-cmd --no-override -f back-dev-env.env node ./scripts/removeTestRecords.js shotgunOnly",
+        "historizeShotguns": "env-cmd --no-override -f back-dev-env.env node scripts/historizeShotguns.js"
     }
 }

@@ -14,4 +14,22 @@ exports.editions = [
         weekendDate: new Date(2020, 9, 25),
         shotgunDate: new Date(2020, 9, 18, 20),
     },
+
+    {
+        year: 2021,
+        weekendDate: new Date(2021, 6, 11),
+        shotgunDate: new Date(2021, 5, 17, 18),
+    },
+
+    {
+        year: 2022,
+        weekendDate: new Date(2022, 6, 10),
+        shotgunDate: new Date(2022, 6, 10),
+    },
+
+    {
+        year: 2023,
+        weekendDate: new Date(2023, 6, 9),
+        shotgunDate: new Date(2023, 5, 20),
+    },
 ];

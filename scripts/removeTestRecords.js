@@ -33,7 +33,7 @@ const deleteTestUsersShotguns = async () => {
         const shotguns = await Shotgun.find({}).populate("user");
         const testShotguns = shotguns.filter((shotgun) => isTestShotgun(shotgun));
 
-        await Promise.all(testShotguns.map((shotgun) => shotgun.remove()));
+        await Promise.all(testShotguns.map((shotgun) => shotgun.deleteOne()));
 
         let result = await User.updateMany(
             { username: { $in: testUsernames } },
@@ -87,7 +87,6 @@ const deleteTestUsersTrips = async () => {
         };
     }
 };
-
 
 const deleteTestUsers = async () => {
     console.log("\nDeleting test users.");

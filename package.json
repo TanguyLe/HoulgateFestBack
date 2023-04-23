@@ -14,7 +14,7 @@
         }
     ],
     "engines": {
-        "node": "^19.8.1"
+        "node": "^18.16.0"
     },
     "repository": {
         "type": "git",
@@ -36,6 +36,7 @@
         "express": "^4.18.2",
         "jsonwebtoken": "^9.0.0",
         "mongoose": "^7.0.3",
+        "node": "18.16.0",
         "nodemailer": "^6.9.1"
     },
     "overrides": {
@@ -55,6 +56,7 @@
         "createTestRecords": "env-cmd --no-override -f back-dev-env.env node scripts/createTestRecords.js",
         "removeTestRecords": "env-cmd --no-override -f back-dev-env.env node ./scripts/removeTestRecords.js",
         "removeTestShotguns": "env-cmd --no-override -f back-dev-env.env node ./scripts/removeTestRecords.js shotgunOnly",
-        "historizeShotguns": "env-cmd --no-override -f back-dev-env.env node scripts/historizeShotguns.js"
+        "historizeShotguns": "env-cmd --no-override -f back-dev-env.env node scripts/historizeShotguns.js",
+        "v": "node -v"
     }
 }

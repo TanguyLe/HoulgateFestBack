@@ -133,7 +133,7 @@ exports.shotgunCreatePost = (req, res) => {
         ],
         (err, shotgun) => {
             if (err) {
-                return res.status(err.httpStatusCode || "500").send({
+                return res.status(err.httpStatusCode || 500).send({
                     meta: {
                         error_type: err.name,
                         code: err.httpStatusCode || "500",
@@ -196,44 +196,65 @@ exports.shotgunDelete = (req, res) => {
                 console.log("Find shotgun...");
                 console.log(req.params);
                 // Find shotgun
-                Shotgun.findOne({ room: req.params.roomId }, (err, shotgun) => {
-                    if (err) return callback(err);
-                    if (!shotgun)
-                        return callback(shotgunErrors.getShotgunNotFoundError(req.params.roomId));
+                Shotgun.findOne({ room: req.params.roomId }).then(
+                    (shotgun) => {
+                        if (!shotgun)
+                            return callback(
+                                shotgunErrors.getShotgunNotFoundError(req.params.roomId)
+                            );
 
-                    console.log("... Shotgun found.");
-                    callback(null, shotgun);
-                });
+                        console.log("... Shotgun found.");
+                        callback(null, shotgun);
+                    },
+                    (err) => {
+                        return callback(err);
+                    }
+                );
             },
             // check user owner
             (shotgun, callback) => {
                 console.log("Check user owner...");
-                User.findOne({ email: user.email }, (err, user) => {
-                    if (err) return callback(err);
-                    if (!user)
-                        return callback(userErrors.getUserNotFoundError("email", user.email));
+                User.findOne({ email: user.email }).then(
+                    (user) => {
+                        if (!user)
+                            return callback(userErrors.getUserNotFoundError("email", user.email));
 
-                    // check that only the user owner can update his room
-                    if (!(String(user._id) === String(shotgun.user))) {
-                        console.error(
-                            "-> User " +
-                                user.username +
-                                " doesn't own the shotgun. Can't delete the shotgun."
-                        );
-                        let error = new Error(
-                            "User " + user.username + " doesn't own the shotgun. Delete forbidden"
-                        );
-                        error.name = "Error 403 : Forbidden";
-                        error.httpStatusCode = "403";
-                        return callback(error);
+                        // check that only the user owner can update his room
+                        if (!(String(user._id) === String(shotgun.user))) {
+                            console.error(
+                                "-> User " +
+                                    user.username +
+                                    " doesn't own the shotgun. Can't delete the shotgun."
+                            );
+                            let error = new Error(
+                                "User " +
+                                    user.username +
+                                    " doesn't own the shotgun. Delete forbidden"
+                            );
+                            error.name = "Error 403 : Forbidden";
+                            error.httpStatusCode = "403";
+                            return callback(error);
+                        }
+                        callback();
+                    },
+                    (err) => {
+                        return callback(err);
                     }
-                    callback();
-                });
+                );
             },
             // Delete shotgun
             (callback) => {
-                Shotgun.findOneAndRemove({ room: req.params.roomId }, (err, deletedShotgun) => {
-                    if (err) {
+                Shotgun.findOneAndRemove({ room: req.params.roomId }).then(
+                    (deletedShotgun) => {
+                        if (!deletedShotgun)
+                            return callback(
+                                shotgunErrors.getShotgunNotFoundError(req.params.roomId)
+                            );
+                        console.log("... Shotgun successfully deleted.");
+                        timeout.clearShotgunTimeout(deletedShotgun); // remove timeout set when the shotgun was created
+                        callback(null, deletedShotgun);
+                    },
+                    (err) => {
                         console.error("-> Shotgun deleting error.");
                         return callback(
                             errors.getServerError(
@@ -243,12 +264,7 @@ exports.shotgunDelete = (req, res) => {
                             )
                         );
                     }
-                    if (!deletedShotgun)
-                        return callback(shotgunErrors.getShotgunNotFoundError(req.params.roomId));
-                    console.log("... Shotgun successfully deleted.");
-                    timeout.clearShotgunTimeout(deletedShotgun); // remove timeout set when the shotgun was created
-                    callback(null, deletedShotgun);
-                });
+                );
             },
             (shotgun, callback) => {
                 // roll back the roommates
@@ -293,7 +309,7 @@ exports.shotgunDelete = (req, res) => {
         (err) => {
             if (err) {
                 console.error("-> Error while deleting from DB.");
-                return res.status(err.httpStatusCode || "500").send({
+                return res.status(err.httpStatusCode || 500).send({
                     meta: {
                         error_type: err.name,
                         code: err.httpStatusCode || "500",
@@ -317,8 +333,17 @@ exports.shotgunDelete = (req, res) => {
 exports.roomList = (req, res) => {
     Shotgun.find({}, { __v: 0 })
         .populate("room", { __v: 0 })
-        .exec((err, foundShotguns) => {
-            if (err) {
+        .exec()
+        .then(
+            (foundShotguns) => {
+                res.status(200).send({
+                    meta: {
+                        code: "200",
+                    },
+                    data: foundShotguns,
+                });
+            },
+            (err) => {
                 return res.status("500").send({
                     meta: {
                         error_type: "Error 500 : Internal Server Error",
@@ -328,13 +353,7 @@ exports.roomList = (req, res) => {
                     },
                 });
             }
-            res.status(200).send({
-                meta: {
-                    code: "200",
-                },
-                data: foundShotguns,
-            });
-        });
+        );
 };
 
 // Handle roommates addition to shotgun on PUT.
@@ -414,15 +433,19 @@ exports.roommatesAdd = (req, res, next) => {
                         __v: 0,
                     })
                     .populate("roommates", { password: 0, __v: 0 })
-                    .exec((err, populatedShotgun) => {
-                        if (err)
+                    .exec()
+                    .then(
+                        (populatedShotgun) => {
+                            callback(null, populatedShotgun);
+                        },
+                        (err) => {
                             return callback(
                                 errors.getServerError(
                                     "Couldn't populate shotgun " + shotgun._id + "."
                                 )
                             );
-                        callback(null, populatedShotgun);
-                    });
+                        }
+                    );
             },
         ],
         (err, shotgun) => {
@@ -436,7 +459,7 @@ exports.roommatesAdd = (req, res, next) => {
                         },
                     });
                 } else
-                    return res.status(err.httpStatusCode || "500").send({
+                    return res.status(err.httpStatusCode || 500).send({
                         meta: {
                             error_type: err.name,
                             code: err.httpStatusCode || "500",

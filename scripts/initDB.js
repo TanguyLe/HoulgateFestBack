@@ -25,15 +25,25 @@ let createRooms = (callback) => {
     // For each floor and each room inside it we prepare a function to create it
     villaLesGenets.villaLesGenets.floors.forEach((floor) => {
         floor.rooms.forEach((room) =>
-            stackCreateRooms.push((cb) =>
-                new Room({
+            stackCreateRooms.push(async () => {
+                const newroom = new Room({
                     type: room.type,
                     text: room.name,
                     nbBeds: room.seats,
-                }).save(getSaveCallBack("Room", cb, "text"))
-            )
+                });
+                await newroom.save().then(
+                    (savedItem) => {
+                        getSaveCallBack("Room", "text", savedItem);
+                    },
+                    (err) => {
+                        console.error(`Error creating room ${room.name} because of: ${err}`);
+                        throw new Error(err);
+                    }
+                );
+            })
         );
     });
+
     // And then they're executed in parallel
     async.parallel(async.reflectAll(stackCreateRooms), callback);
 };
@@ -41,13 +51,24 @@ let createRooms = (callback) => {
 let createEditions = (callback) => {
     async.parallel(
         async.reflectAll(
-            editions.editions.map((editionDef) => (cb) =>
-                new Edition({
+            editions.editions.map((editionDef) => async () => {
+                const newedition = new Edition({
                     year: editionDef.year,
                     weekendDate: editionDef.weekendDate,
                     shotgunDate: editionDef.shotgunDate,
-                }).save(getSaveCallBack("Edition", cb, "year"))
-            )
+                });
+                await newedition.save().then(
+                    (savedItem) => {
+                        getSaveCallBack("Edition", "year", savedItem);
+                    },
+                    (err) => {
+                        console.error(
+                            `Error creating edition ${editionDef.year}.${editionDef.weekendDate} because of: ${err}`
+                        );
+                        throw new Error(err);
+                    }
+                );
+            })
         ),
         callback
     );

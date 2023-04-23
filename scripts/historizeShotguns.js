@@ -67,15 +67,34 @@ const moveShotguns = (callback) => {
                             shotguns.map((shotgun) => (cb) => {
                                 async.series(
                                     [
-                                        (cb) =>
-                                            new ShotgunsHistory({
+                                        (cb) => {
+                                            const newshotgun = new ShotgunsHistory({
                                                 status: shotgun.status,
                                                 room: shotgun.room,
                                                 user: shotgun.user,
                                                 roommates: shotgun.roommates,
                                                 edition: currentEdition.id,
-                                            }).save(getSaveCallBack("ShotgunsHistory", cb)),
-                                        (cb) => shotgun.remove(getRemoveCallback("Shotgun", cb)),
+                                            });
+                                            newshotgun.save().then(
+                                                (savedItem) => {
+                                                    getSaveCallBack(
+                                                        "ShotgunsHistory",
+                                                        "",
+                                                        savedItem
+                                                    );
+                                                },
+                                                (err) => {
+                                                    console.error(
+                                                        `Error creating shotgun ${currentEdition.id} because of: ${err}`
+                                                    );
+                                                    throw new Error(err);
+                                                }
+                                            );
+                                        },
+                                        (cb) =>
+                                            shotgun.remove(
+                                                getRemoveCallback("Shotgun", "", shotgun)
+                                            ),
                                     ],
                                     cb
                                 );

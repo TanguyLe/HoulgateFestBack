@@ -51,10 +51,14 @@ let rollBackUsers = (users, roomId, callback) => {
     users.forEach((item) => {
         // depending on the data type representing the user (email or id), we call findById or findOne
         if (item instanceof mongoose.Types.ObjectId)
-            updateUser = (callback) => User.findById(item, handleUserRollback(item, callback));
-        else
             updateUser = (callback) =>
-                User.findOne({ email: item }, handleUserRollback(item, callback));
+                User.findById(item).then(handleUserRollback(item, callback)).catch(callback);
+        else
+            updateUser = async (callback) => {
+                const user = await User.findOne({ email: item })
+                    .then(handleUserRollback(item, callback))
+                    .catch(callback);
+            };
         stackUpdateUsers.push(updateUser);
     });
 
@@ -94,15 +98,15 @@ let rollBackShotgun = (roomId, callback) => {
                         roommates: [],
                         status: "preShotgunned",
                     },
-                    { new: true },
-                    (err, shotgun) => {
-                        if (err) {
-                            console.error("-> Error while rolling back the Shotgun.");
-                            return callback(err);
-                        }
+                    { new: true }
+                )
+                    .then((shotgun) => {
                         return callback(null, shotgun);
-                    }
-                );
+                    })
+                    .catch((err) => {
+                        console.error("-> Error while rolling back the Shotgun.");
+                        return callback(err);
+                    });
             },
         ],
         (err, shotgun) => {

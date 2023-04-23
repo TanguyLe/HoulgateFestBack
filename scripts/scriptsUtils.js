@@ -7,24 +7,20 @@ const isFunction = (functionToCheck) => {
 const getSaveMessage = (schemaName, objStr) => `New ${schemaName} in the db: ${objStr}.`;
 const getDeleteMessage = (schemaName, objStr) => `${schemaName} removed from the db: ${objStr}.`;
 
-const getSingleOperationCallback = (label, callback, objectSerialize, messageFct) => (
-    err,
-    object
-) => {
-    if (err) {
-        console.log(err.errmsg);
-        callback(err, null);
-        return;
+const getSingleOperationCallback = async (label, objectSerialize, messageFct, object) => {
+    try {
+        let objStr;
+        if (objectSerialize)
+            if (isFunction(objectSerialize)) objStr = objectSerialize(object);
+            else objStr = object[objectSerialize];
+        else objStr = object.toString().replace(/\n/g, "");
+
+        console.log(messageFct(label, objStr));
+    } catch (err) {
+        console.log("Error");
+        console.error(`${err.errmsg}`);
+        throw new Error("Something failed");
     }
-
-    let objStr;
-    if (objectSerialize)
-        if (isFunction(objectSerialize)) objStr = objectSerialize(object);
-        else objStr = object[objectSerialize];
-    else objStr = object.toString().replace(/\n/g, "");
-
-    console.log(messageFct(label, objStr));
-    callback(null);
 };
 
 module.exports = {
@@ -41,7 +37,7 @@ module.exports = {
     },
     connectToDb: (mongoDBUri) => {
         mongoose.Promise = global.Promise;
-        mongoose.set("useCreateIndex", true);
+        //mongoose.set("useCreateIndex", true);
         mongoose.connection.on("error", console.error.bind(console, "MongoDB connection error:"));
         mongoose.connect(mongoDBUri, {
             useNewUrlParser: true,
@@ -50,32 +46,32 @@ module.exports = {
 
         return mongoose.connection;
     },
-    getSaveCallback: (label, callback, objectSerialize) =>
-        getSingleOperationCallback(label, callback, objectSerialize, getSaveMessage),
-    getRemoveCallback: (label, callback, objectSerialize) =>
-        getSingleOperationCallback(label, callback, objectSerialize, getDeleteMessage),
-    getDeleteManyCallback: (label, callback) => (err, result) => {
-        if (err) {
-            console.log(err.errmsg);
-            callback(err, null);
-            return;
-        }
-        console.log(`${label} have been deleted if present, ${result.n} actual deletions.`);
-        callback(null);
+    closeDb: (mongooseConnection) => {
+        // All done, disconnect from database
+        console.log("closing the connection...");
+        mongooseConnection.close();
+        console.log("DB closed.");
     },
-    getUpdateManyCallback: (label, callback) => (err, result) => {
-        if (err) {
-            console.log(err.errmsg);
-            callback(err, null);
-            return;
-        }
-        console.log(`${label} have been updated if present, ${result.nModified} actual updates.`);
-        callback(null);
+    getSaveCallback: (label, objectSerialize, object) =>
+        getSingleOperationCallback(label, objectSerialize, getSaveMessage, object),
+    getRemoveCallback: (label, objectSerialize, object) =>
+        getSingleOperationCallback(label, objectSerialize, getDeleteMessage, object),
+    getDeleteManyCallback: (label, result) => {
+        console.log(
+            `${label} have been deleted if present, ${result.deletedCount} actual deletions.`
+        );
     },
-    getMainCallback: (mongooseConnection) => (err) => {
+    getUpdateManyCallback: (label, result) => {
+        console.log(
+            `${label} have been updated if present, ${result.modifiedCount} actual updates.`
+        );
+    },
+    getMainCallback: (mongooseConnection) => (err, result) => {
         if (err) {
             console.log("\nDB Operation failed due to an error: " + err);
-        } else console.log("\nDB Operation finished successfully, closing the connection.");
+        } else {
+            console.log("\nDB Operation finished successfully, closing the connection.");
+        }
         // All done, disconnect from database
         mongooseConnection.close();
     },

@@ -19,50 +19,56 @@ console.log(
         " It will fail if the DB is not accessible and log if a record is already present. \n"
 );
 
-let createTestUsers = (callback) => {
+let createTestUsers = async function () {
     console.log("\nCreating test users.");
 
-    async.parallel(
-        async.reflectAll(
-            scriptsUtils.testUsers.map((user) => (cb) =>
-                new User({
-                    username: user[0],
-                    email: user[1],
-                    password: passwordUtils.cryptPasswordSync(user[2]),
-                    activated: user[3],
-                }).save(getSaveCallBack("User", cb, "username"))
-            )
-        ),
-        callback
-    );
+    console.log("Test users nb : " + scriptsUtils.testUsers.length);
+
+    const usersPromises = scriptsUtils.testUsers.map(async (user) => {
+        const newuser = new User({
+            username: user[0],
+            email: user[1],
+            password: passwordUtils.cryptPasswordSync(user[2]),
+            activated: user[3],
+        });
+        newuser.save().then(
+            (savedItem) => {
+                getSaveCallBack("User", "username", savedItem);
+            },
+            (err) => {
+                console.error(`Error creating test user ${user[0]} because of: ${err}`);
+                throw new Error(err);
+            }
+        );
+    });
+    await Promise.all(usersPromises);
 };
 
-const createTestTrips = (callback) => {
+let createTestTrips = async function () {
     console.log("\nCreating test trips.");
 
-    async.waterfall(
-        [
-            (cb) =>
-                User.find({ username: { $in: scriptsUtils.testUsers.map((user) => user[0]) } }, cb),
-            (users, cb) =>
-                async.parallel(
-                    async.reflectAll(
-                        scriptsUtils.testTrips.map((trip, index) => (cb) =>
-                            new Trip({
-                                date: trip[0],
-                                driver: users[index],
-                                passengers: [users[index], users[index + 1]],
-                                location: trip[1],
-                                seats: trip[2],
-                                type: trip[3],
-                            }).save(getSaveCallBack("Trip", cb, serializeTrip))
-                        )
-                    ),
-                    cb
-                ),
-        ],
-        callback
-    );
+    const users = await User.find({
+        username: { $in: scriptsUtils.testUsers.map((user) => user[0]) },
+    });
+
+    const tripPromises = scriptsUtils.testTrips.map(async (trip, index) => {
+        const driver = users[index];
+        const passengers = [users[index], users[index + 1]];
+        const location = trip[1];
+        const seats = trip[2];
+        const type = trip[3];
+        const newTrip = new Trip({ date: trip[0], driver, passengers, location, seats, type });
+        await newTrip.save().then(
+            (savedItem) => {
+                getSaveCallBack("Trip", serializeTrip, savedItem);
+            },
+            (err) => {
+                console.error(`Error creating test trip because of: ${err}`);
+                throw new Error(err);
+            }
+        );
+    });
+    await Promise.all(tripPromises);
 };
 
-async.series(async.reflectAll([createTestUsers, createTestTrips]), mainCallback);
+async.series([createTestUsers, createTestTrips], mainCallback);

@@ -59,14 +59,15 @@ exports.afterCompleteShotgun = (shotgun) => {
                 __v: 0,
             })
             .populate("roommates", { password: 0, __v: 0 })
-            .exec((err, populatedShotgun) => {
-                if (err) {
-                    console.error("-> Couldn't populate shotgun " + shotgun._id + ".");
-                    return callback(
-                        errors.getServerError("Couldn't populate shotgun " + shotgun._id + ".")
-                    );
-                }
+            .exec()
+            .then((populatedShotgun) => {
                 callback(null, populatedShotgun);
+            })
+            .catch((err) => {
+                console.error("-> Couldn't populate shotgun " + shotgun._id + ".");
+                return callback(
+                    errors.getServerError("Couldn't populate shotgun " + shotgun._id + ".")
+                );
             });
     };
 

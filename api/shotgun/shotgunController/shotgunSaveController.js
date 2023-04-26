@@ -23,7 +23,7 @@ exports.savePreShotgun = (userId, room, callback) => {
                         callback(null, shotgun);
                     })
                     .catch((err) => {
-                        return callback(err);
+                        callback(err);
                     });
             },
             // Update the user owner of the shotgun
@@ -42,16 +42,18 @@ exports.savePreShotgun = (userId, room, callback) => {
                                 hasPreShotgun: true,
                                 room: roomId,
                             },
-                            { new: true },
-                            (err, foundUser) => {
-                                if (err) return callback(err);
-
-                                if (!foundUser) return callback(userErrors("id", shotgun.user));
+                            { new: true }
+                        )
+                            .then((foundUser) => {
+                                if (err)
+                                    if (!foundUser) return callback(userErrors("id", shotgun.user));
 
                                 console.log("...User " + foundUser.username + " is updated.");
                                 callback(null, shotgun);
-                            }
-                        );
+                            })
+                            .catch((err) => {
+                                return callback(err);
+                            });
                     });
                 } else {
                     User.findByIdAndUpdate(
@@ -60,16 +62,19 @@ exports.savePreShotgun = (userId, room, callback) => {
                             hasPreShotgun: true,
                             room: roomId,
                         },
-                        { new: true },
-                        (err, foundUser) => {
-                            if (err) return callback(err);
-
-                            if (!foundUser) return callback(userErrors("id", shotgun.user));
+                        { new: true }
+                    )
+                        .then((foundUser) => {
+                            if (!foundUser) {
+                                callback(userErrors("id", shotgun.user));
+                            }
 
                             console.log("...User " + foundUser.username + " is updated.");
                             callback(null, shotgun);
-                        }
-                    );
+                        })
+                        .catch((err) => {
+                            callback(err);
+                        });
                 }
             },
             // retrieve the full shotgun
@@ -80,9 +85,12 @@ exports.savePreShotgun = (userId, room, callback) => {
                         password: 0,
                         __v: 0,
                     })
-                    .exec((err, foundShotgun) => {
-                        if (err) return callback(err);
+                    .exec()
+                    .then((foundShotgun) => {
                         callback(null, foundShotgun);
+                    })
+                    .catch((err) => {
+                        callback(err);
                     });
             },
         ],

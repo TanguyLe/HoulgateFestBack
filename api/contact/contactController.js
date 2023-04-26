@@ -13,7 +13,7 @@ exports.send = (req, res) => {
 
         mail.mailSender(mailContent, (err) => {
             if (err) {
-                return res.status(err.httpStatusCode || "500").send({
+                return res.status(err.httpStatusCode || 500).send({
                     meta: {
                         error_type: err.name || "Error 500 : Internal Server Error",
                         code: err.httpStatusCode || "500",
@@ -32,7 +32,7 @@ exports.send = (req, res) => {
 
             mail.mailSender(contactAnswer, (err) => {
                 if (err) {
-                    return res.status(err.httpStatusCode || "500").send({
+                    return res.status(err.httpStatusCode || 500).send({
                         meta: {
                             error_type: err.name || "Error 500 : Internal Server Error",
                             code: err.httpStatusCode || "500",

@@ -14,57 +14,25 @@ exports.shotgunUsers = (shotgun, userOwner, updateRoommates, roomId, callback) =
     // Create tasks for checking and updating the users
     // update the user Owner
     let updateUserOwner = (callback) => {
-        User.findOne({ email: userOwner.email }, (err, user) => {
-            if (err) return callback(err);
-            if (!user) return callback(userError.getUserNotFoFundError("email", userOwner.email));
+        User.findOne({ email: userOwner.email }).then(
+            (user) => {
+                if (!user)
+                    return callback(userError.getUserNotFoFundError("email", userOwner.email));
 
-            // check that only the user owner can update his room
-            if (!(String(user._id) === String(shotgun.user))) {
-                console.error(
-                    "-> User " +
-                        user.username +
-                        " doesn't own the shotgun. Can't update the shotgun."
-                );
-                let error = new Error(
-                    "User " + user.username + " doesn't own the shotgun. Update forbidden"
-                );
-                error.name = "Error 403 : Forbidden";
-                error.httpStatusCode = "403";
-                return callback(error);
-            }
-
-            // check that user hasn't already shotgun
-            if (user.hasShotgun) {
-                console.error("-> User " + user.username + " has already shotgun");
-                let error = new Error("User " + user.username + " has already shotgun.");
-                error.name = "Error 409 : Conflict";
-                error.httpStatusCode = "409";
-                return callback(error);
-            }
-
-            user.hasShotgun = true;
-            user.room = roomId;
-
-            user.save()
-                .then((user) => {
-                    console.log("User " + user.username + " has shotgun.");
-                    callback();
-                })
-                .catch((err) => {
-                    console.error("-> User " + user.username + " could not be udpated.");
-                    return callback(errors.getServerError("Couldn't save " + user.username));
-                });
-        });
-    };
-
-    // update the roommates
-    updateRoommates.forEach((item) => {
-        let updateRoommate = (callback) => {
-            console.log("Trying to update user:" + item);
-            User.findById(item, (err, user) => {
-                if (err) return callback(err);
-                console.log(item);
-                if (!user) return callback(userError.getUserNotFoundError("id", item));
+                // check that only the user owner can update his room
+                if (!(String(user._id) === String(shotgun.user))) {
+                    console.error(
+                        "-> User " +
+                            user.username +
+                            " doesn't own the shotgun. Can't update the shotgun."
+                    );
+                    let error = new Error(
+                        "User " + user.username + " doesn't own the shotgun. Update forbidden"
+                    );
+                    error.name = "Error 403 : Forbidden";
+                    error.httpStatusCode = "403";
+                    return callback(error);
+                }
 
                 // check that user hasn't already shotgun
                 if (user.hasShotgun) {
@@ -81,13 +49,55 @@ exports.shotgunUsers = (shotgun, userOwner, updateRoommates, roomId, callback) =
                 user.save()
                     .then((user) => {
                         console.log("User " + user.username + " has shotgun.");
-                        callback(null, user._id);
+                        callback();
                     })
                     .catch((err) => {
                         console.error("-> User " + user.username + " could not be udpated.");
                         return callback(errors.getServerError("Couldn't save " + user.username));
                     });
-            });
+            },
+            (err) => {
+                return callback(err);
+            }
+        );
+    };
+
+    // update the roommates
+    updateRoommates.forEach((item) => {
+        let updateRoommate = (callback) => {
+            console.log("Trying to update user:" + item);
+            User.findById(item)
+                .then((user) => {
+                    console.log(item);
+                    if (!user) return callback(userError.getUserNotFoundError("id", item));
+
+                    // check that user hasn't already shotgun
+                    if (user.hasShotgun) {
+                        console.error("-> User " + user.username + " has already shotgun");
+                        let error = new Error("User " + user.username + " has already shotgun.");
+                        error.name = "Error 409 : Conflict";
+                        error.httpStatusCode = "409";
+                        return callback(error);
+                    }
+
+                    user.hasShotgun = true;
+                    user.room = roomId;
+
+                    user.save()
+                        .then((user) => {
+                            console.log("User " + user.username + " has shotgun.");
+                            callback(null, user._id);
+                        })
+                        .catch((err) => {
+                            console.error("-> User " + user.username + " could not be udpated.");
+                            return callback(
+                                errors.getServerError("Couldn't save " + user.username)
+                            );
+                        });
+                })
+                .catch((err) => {
+                    return callback(err);
+                });
         };
         stackUpdateUsers.push(updateRoommate);
     });

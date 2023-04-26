@@ -19,25 +19,31 @@ const fillUserAndTokens = (user, res) => {
 };
 
 exports.login = (req, res) => {
-    User.findOne({ email: req.body.email }, (err, user) => {
-        if (!user)
-            return res
-                .status(401)
-                .json({ wrongField: "email", message: labels.FAILED_AUTH_NO_USER_MSG });
+    User.findOne({ email: req.body.email }).then(
+        (user) => {
+            if (!user)
+                return res
+                    .status(401)
+                    .json({ wrongField: "email", message: labels.FAILED_AUTH_NO_USER_MSG });
 
-        if (!user.activated) return res.status(401).json({ wrongField: "activation" });
+            if (!user.activated) return res.status(401).json({ wrongField: "activation" });
 
-        passwordUtils.comparePassword(req.body.password, user.password).then((authenticated) => {
-            if (!authenticated)
-                return res.status(401).json({
-                    wrongField: "password",
-                    message: labels.FAILED_AUTH_WRONG_PSWD_MSG,
+            passwordUtils
+                .comparePassword(req.body.password, user.password)
+                .then((authenticated) => {
+                    if (!authenticated)
+                        return res.status(401).json({
+                            wrongField: "password",
+                            message: labels.FAILED_AUTH_WRONG_PSWD_MSG,
+                        });
+
+                    fillUserAndTokens(user, res);
                 });
-
-            if (err) res.send(err);
-            else fillUserAndTokens(user, res);
-        });
-    });
+        },
+        (err) => {
+            res.json(err);
+        }
+    );
 };
 
 exports.createUser = (req, res, next) => {
@@ -46,8 +52,13 @@ exports.createUser = (req, res, next) => {
         newUserInfo.password = resPassword;
 
         let newUser = new User(newUserInfo);
-        newUser.save((err, user) => {
-            if (err)
+        newUser.save().then(
+            (user) => {
+                fillUserAndTokens(user, res);
+                req.activator = { id: user.id };
+                next();
+            },
+            (err) => {
                 res.json({
                     errors: {
                         [Object.keys(err.keyValue)[0]]: {
@@ -57,50 +68,55 @@ exports.createUser = (req, res, next) => {
                         },
                     },
                 });
-            else {
-                fillUserAndTokens(user, res);
-                req.activator = { id: user.id };
-                next();
             }
-        });
+        );
     });
 };
 
 exports.afterCompleteActivation = (req, res) => {
-    User.findById(req.params.user, (err, user) => {
-        if (err) res.send(err);
-        else fillUserAndTokens(user, res);
-    });
+    User.findById(req.params.user)
+        .then((user) => {
+            fillUserAndTokens(user, res);
+        })
+        .catch((err) => {
+            res.send(err);
+        });
 };
 
 exports.readUser = (req, res) => {
-    User.findById(req.params.userId, (err, user) => {
-        if (err) res.send(err);
-        else
+    User.findById(req.params.userId)
+        .then((user) => {
             res.json({
                 email: user.email,
                 username: user.username,
                 activated: user.activated,
             });
-    });
+        })
+        .catch((err) => {
+            res.send(err);
+        });
 };
 
 exports.beforeCreatePasswordReset = (req, res, next) => {
-    User.findOne({ email: req.body.email }, (err, user) => {
-        if (err) res.json(err);
-        else if (!user)
-            return res
-                .status(401)
-                .json({ wrongField: "email", message: labels.FAILED_AUTH_NO_USER_MSG });
-        else if (user && !user.activated)
-            return res.status(401).json({
-                wrongField: "activation",
-                message: labels.FAILED_AUTH_ACCOUNT_UNACTIVATED_MSG,
-            });
+    User.findOne({ email: req.body.email }).then(
+        (user) => {
+            if (!user)
+                return res
+                    .status(401)
+                    .json({ wrongField: "email", message: labels.FAILED_AUTH_NO_USER_MSG });
+            else if (user && !user.activated)
+                return res.status(401).json({
+                    wrongField: "activation",
+                    message: labels.FAILED_AUTH_ACCOUNT_UNACTIVATED_MSG,
+                });
 
-        req.params.user = user;
-        next();
-    });
+            req.params.user = user;
+            next();
+        },
+        (err) => {
+            res.json(err);
+        }
+    );
 };
 
 exports.afterCreatePasswordReset = (req, res) => {

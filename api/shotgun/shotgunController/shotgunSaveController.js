@@ -74,7 +74,6 @@ exports.savePreShotgun = (userId, room, callback) => {
                             callback(null, shotgun);
                         })
                         .catch((err) => {
-                            console.log("1");
                             callback(err);
                         });
                 }

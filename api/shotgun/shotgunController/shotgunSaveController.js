@@ -66,7 +66,6 @@ exports.savePreShotgun = (userId, room, callback) => {
                     )
                         .then((foundUser) => {
                             if (!foundUser) {
-                                console.log("1");
                                 callback(userErrors("id", shotgun.user));
                             }
 

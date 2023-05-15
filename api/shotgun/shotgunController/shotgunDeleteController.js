@@ -12,38 +12,49 @@ exports.deleteShotguns = (usersId, callback) => {
     usersId.forEach((item) => {
         // delete shotgun -> can't use deleteMany cause need a ref to a specific shotgun to clear the timeout
         let deleteShotgun = (callback) => {
-            Shotgun.findOneAndRemove({ user: item }, (err, deletedShotgun) => {
-                if (err) return callback(err);
+            Shotgun.findOneAndRemove({ user: item })
+                .then((deletedShotgun) => {
+                    if (!deletedShotgun) return callback();
 
-                if (!deletedShotgun) return callback();
+                    // The user owned a room before
+                    console.log(
+                        "Shotgun associated to user with id " + item + " has been deleted."
+                    );
 
-                // The user owned a room before
-                console.log("Shotgun associated to user with id " + item + " has been deleted.");
+                    timeout.clearShotgunTimeout(deletedShotgun); // remove the timeout that checks if the shotgun has been finalised
 
-                timeout.clearShotgunTimeout(deletedShotgun); // remove the timeout that checks if the shotgun has been finalised
+                    User.findById(item)
+                        .then((user) => async () => {
+                            // if the user is still linked to the deleted shotgun's room
+                            if (String(user.room) === String(deletedShotgun.roomId)) {
+                                user.room = null;
+                            }
+                            user.hasPreShotgun = false; // the user doesn't own a room anymore
 
-                User.findById(item, (err, user) => {
-                    if (err) return callback(err);
-
-                    // if the user is still linked to the deleted shotgun's room
-                    if (String(user.room) === String(deletedShotgun.roomId)) {
-                        user.room = null;
-                    }
-                    user.hasPreShotgun = false; // the user doesn't own a room anymore
-
-                    user.save()
-                        .then((user) => {
-                            console.log("User " + user.username + " doesn't own a room anymore.");
-                            return callback();
+                            await user
+                                .save()
+                                .then((user) => {
+                                    console.log(
+                                        "User " + user.username + " doesn't own a room anymore."
+                                    );
+                                    return callback();
+                                })
+                                .catch((err) => {
+                                    console.error(
+                                        "-> User " + user.username + " could not be updated."
+                                    );
+                                    return callback(
+                                        errors.getServerError("Couldn't save " + user.username)
+                                    );
+                                });
                         })
                         .catch((err) => {
-                            console.error("-> User " + user.username + " could not be updated.");
-                            return callback(
-                                errors.getServerError("Couldn't save " + user.username)
-                            );
+                            return callback(err);
                         });
+                })
+                .catch((err) => {
+                    return callback(err);
                 });
-            });
         };
         stackDeleteShotguns.push(deleteShotgun);
     });

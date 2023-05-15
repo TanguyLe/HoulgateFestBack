@@ -23,59 +23,68 @@ exports.shotgunTimeoutTriggered = (shotgun) => {
     console.log("Timeout triggered for shotgun on room " + shotgun.room._id);
 
     // check if shotgun exists and delete it if shotgun is not completed
-    Shotgun.findById(shotgun._id, (err, shotgun) => {
-        if (err) console.error(err);
-        if (!shotgun) {
-            console.log("...shotgun is NOT done after timeout. Nothing to be done.");
-            return null;
-        }
-        if (shotgun.status !== "shotgunned") {
-            console.log("Deleting Shotgun on room " + shotgun.room + "...");
-            // delete shotgun
-            let deleteShotgun = (shotgun, callback) => {
-                Shotgun.findByIdAndRemove(shotgun._id, (err, deletedShotgun) => {
-                    if (err) {
-                        console.error("-> Shotgun deleting error.");
-                        return callback(
-                            errors.getServerError(
-                                "Shotgun with roomId " + shotgun.room + " could not be deleted."
-                            )
-                        );
-                    }
-                    if (!deletedShotgun)
-                        return callback(shotgunErrors.getShotgunNotFoundError(shotgun.room));
+    Shotgun.findById(shotgun._id)
+        .then((shotgun) => {
+            if (!shotgun) {
+                console.log("...shotgun is NOT done after timeout. Nothing to be done.");
+                return null;
+            }
+            if (shotgun.status !== "shotgunned") {
+                console.log("Deleting Shotgun on room " + shotgun.room + "...");
+                // delete shotgun
+                let deleteShotgun = (shotgun, callback) => {
+                    Shotgun.findByIdAndRemove(shotgun._id)
+                        .then((deletedShotgun) => {
+                            if (!deletedShotgun)
+                                return callback(
+                                    shotgunErrors.getShotgunNotFoundError(shotgun.room)
+                                );
 
-                    callback(null, deletedShotgun);
-                });
-            };
+                            callback(null, deletedShotgun);
+                        })
+                        .catch((err) => {
+                            console.error("-> Shotgun deleting error. (" + err + ")");
+                            return callback(
+                                errors.getServerError(
+                                    "Shotgun with roomId " + shotgun.room + " could not be deleted."
+                                )
+                            );
+                        });
+                };
 
-            // roll back the user owner
-            let updateUserOwner = (shotgun, callback) => {
-                // special tratment for user owner
-                User.findByIdAndUpdate(
-                    shotgun.user,
-                    { hasShotgun: false, hasPreShotgun: false, room: null },
-                    (err, user) => {
-                        if (err) return callback(err);
-                        console.log("User " + user.username + " rolled back.");
-                        callback();
+                // roll back the user owner
+                let updateUserOwner = (shotgun, callback) => {
+                    // special tratment for user owner
+                    User.findByIdAndUpdate(shotgun.user, {
+                        hasShotgun: false,
+                        hasPreShotgun: false,
+                        room: null,
+                    })
+                        .then((user) => {
+                            console.log("User " + user.username + " rolled back.");
+                            callback();
+                        })
+                        .catch((err) => {
+                            return callback(err);
+                        });
+                };
+
+                async.parallel(
+                    {
+                        delete: deleteShotgun.bind(null, shotgun),
+                        update: updateUserOwner.bind(null, shotgun),
+                    },
+                    (err) => {
+                        if (err) {
+                            console.error("-> Error while deleting from DB.");
+                            return;
+                        }
+                        console.log("...shotgun on room " + shotgun.room + " deleted.");
                     }
                 );
-            };
-
-            async.parallel(
-                {
-                    delete: deleteShotgun.bind(null, shotgun),
-                    update: updateUserOwner.bind(null, shotgun),
-                },
-                (err) => {
-                    if (err) {
-                        console.error("-> Error while deleting from DB.");
-                        return;
-                    }
-                    console.log("...shotgun on room " + shotgun.room + " deleted.");
-                }
-            );
-        }
-    });
+            }
+        })
+        .catch((err) => {
+            console.error(err);
+        });
 };

@@ -12,15 +12,18 @@ exports.activator = activator;
 exports.config = {
     user: {
         find: (id, callback) => {
-            User.findById(id, (err, user) => {
-                if (err) callback(err, null);
-                else if (!user) callback(null, null);
-                else {
-                    let res = { id: user.id, email: user.email };
+            User.findById(id)
+                .then((user) => {
+                    if (!user) callback(null, null);
+                    else {
+                        let res = { id: user.id, email: user.email };
 
-                    callback(null, res);
-                }
-            });
+                        callback(null, res);
+                    }
+                })
+                .catch((err) => {
+                    callback(err, null);
+                });
         },
         activate: (id, callback) => {
             User.updateOne(

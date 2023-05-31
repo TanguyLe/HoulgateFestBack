@@ -38,13 +38,14 @@ let retrieveShotguns = (cb) => {
             room: 0,
             activated: 0,
         })
-        .exec((err, shotguns) => {
-            if (err) {
-                console.error(err);
-                return cb(err);
-            }
+        .exec()
+        .then((shotguns) => {
             console.log("-> Completed shotguns retrieved.");
             return cb(null, shotguns);
+        })
+        .catch((err) => {
+            console.error(err);
+            return cb(err);
         });
 };
 
@@ -59,13 +60,15 @@ let retrieveStandaloneUsers = (shotguns, cb) => {
             room: 0,
             activated: 0,
         }
-    ).exec((err, users) => {
-        if (err) {
-            console.error(err);
-            return cb(err);
-        }
+    )
+    .exec()
+    .then((users) => {
         console.log("-> Standalone users retrieved.");
         return cb(null, shotguns, users);
+    })
+    .catch((err) => {
+        console.error(err);
+        return cb(err);
     });
 };
 

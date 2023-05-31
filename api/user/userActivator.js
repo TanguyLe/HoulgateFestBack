@@ -22,23 +22,35 @@ exports.config = {
                     }
                 })
                 .catch((err) => {
+                    console.error(err)
                     callback(err, null);
                 });
         },
         activate: (id, callback) => {
             User.updateOne(
                 { _id: new mongo.ObjectId(id) },
-                { $set: { activated: true } },
-                callback
-            );
+                { $set: { activated: true } }
+            )
+            .then((obj) => {
+                callback(null,obj);
+            })
+            .catch((err) => {
+                console.error(err)
+                callback(err, null);
+            });
         },
         setPassword: (id, password, callback) => {
             passwordUtils.cryptPassword(password).then((resPassword) => {
                 User.updateOne(
                     { _id: new mongo.ObjectId(id) },
                     { $set: { password: resPassword } },
-                    callback
-                );
+                    )
+                    .then((obj) => {
+                        callback(null,obj);
+                    })
+                    .catch((err) => {
+                        callback(err, null);
+                    });
             });
         },
     },

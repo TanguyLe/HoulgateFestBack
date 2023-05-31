@@ -56,37 +56,39 @@ exports.createUser = (req, res, next) => {
         User.findOne({ email: newUserInfo.email }).then(
             (user) => {
                 if (!user) {
-                newUser.save().then(
-                    (user) => {
-                        console.log("Created user " + newUserInfo.email);
-                        req.activator = { id: user.id };
-                        next();
-                    },
-                    (err) => res.send(err)
-                );
-                }
-                else {
+                    newUser.save().then(
+                        (user) => {
+                            console.log("Created user " + newUserInfo.email);
+                            req.activator = { id: user.id };
+                            next();
+                        },
+                        (err) => res.send(err)
+                    );
+                } else {
                     res.json({
-                        errors: { email : { message: `Email ${
-                            newUserInfo.email
-                        } is already taken, take another.`, }, }
+                        errors: {
+                            email: {
+                                message: `Email ${newUserInfo.email} is already taken, take another.`,
+                            },
+                        },
                     });
                 }
-            }, (err) => res.send(err)
+            },
+            (err) => res.send(err)
         );
     });
 };
 
-exports.createActivateHandler = function (req,res,next) {
-	// the header is not normally set, so we know we incurred the handler
-	res.set("activator","createActivateHandler");
-	res.status(201).send({});
-}
+exports.createActivateHandler = function (req, res, next) {
+    // the header is not normally set, so we know we incurred the handler
+    res.set("activator", "createActivateHandler");
+    res.status(201).send({});
+};
 
 exports.afterCompleteActivation = (req, res) => {
     User.findById(req.params.user)
         .then((user) => {
-            console.log("Activated user " + user.email)
+            console.log("Activated user " + user.email);
             fillUserAndTokens(user, res);
         })
         .catch((err) => {
@@ -135,7 +137,7 @@ exports.afterCreatePasswordReset = (req, res) => {
 };
 
 exports.afterCompletePasswordReset = (req, res) => {
-    console.log("Password reset for user " + req.params.user)
+    console.log("Password reset for user " + req.params.user);
     res.status(200).json({});
 };
 

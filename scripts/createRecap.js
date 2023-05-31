@@ -61,15 +61,15 @@ let retrieveStandaloneUsers = (shotguns, cb) => {
             activated: 0,
         }
     )
-    .exec()
-    .then((users) => {
-        console.log("-> Standalone users retrieved.");
-        return cb(null, shotguns, users);
-    })
-    .catch((err) => {
-        console.error(err);
-        return cb(err);
-    });
+        .exec()
+        .then((users) => {
+            console.log("-> Standalone users retrieved.");
+            return cb(null, shotguns, users);
+        })
+        .catch((err) => {
+            console.error(err);
+            return cb(err);
+        });
 };
 
 let createRecapFile = (shotguns, users, cb) => {

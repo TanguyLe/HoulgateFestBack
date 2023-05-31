@@ -4,7 +4,11 @@ module.exports = (app) => {
 
     userActivator.activator.init(userActivator.config);
 
-    app.route("/users").post(user.createUser, userActivator.activator.createActivateNext,user.createActivateHandler);
+    app.route("/users").post(
+        user.createUser,
+        userActivator.activator.createActivateNext,
+        user.createActivateHandler
+    );
 
     app.route("/users/:user/activate").get(
         userActivator.activator.completeActivateNext,

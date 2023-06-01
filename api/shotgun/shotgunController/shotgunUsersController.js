@@ -17,7 +17,7 @@ exports.shotgunUsers = (shotgun, userOwner, updateRoommates, roomId, callback) =
         User.findOne({ email: userOwner.email }).then(
             (user) => {
                 if (!user)
-                    return callback(userError.getUserNotFoFundError("email", userOwner.email));
+                    return callback(userError.getUserNotFoundError("email", userOwner.email));
 
                 // check that only the user owner can update his room
                 if (!(String(user._id) === String(shotgun.user))) {

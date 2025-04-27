@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+-   Security fixes of indirect deps [PR95](https://github.com/TanguyLe/HoulgateFestBack/pull/95)
+
 ## [v0.4.1] 2023-06-01
 
 ### Fixed

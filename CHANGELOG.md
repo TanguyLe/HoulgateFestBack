@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
--   Security fixes of indirect deps [PR95](https://github.com/TanguyLe/HoulgateFestBack/pull/95)
+-   Security fixes of indirect deps [PR96](https://github.com/TanguyLe/HoulgateFestBack/pull/96)
+-   Add a route to get the current Paris time [PR97](https://github.com/TanguyLe/HoulgateFestBack/pull/97)
 
 ## [v0.4.1] 2023-06-01
 

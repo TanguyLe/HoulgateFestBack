@@ -17,7 +17,8 @@ let express = require("express"),
     roomRoutes = require("./api/room/roomRoutes"),
     shotgunRoutes = require("./api/shotgun/shotgunRoutes"),
     tripRoutes = require("./api/trip/tripRoutes"),
-    contactRoutes = require("./api/contact/contactRoutes");
+    contactRoutes = require("./api/contact/contactRoutes"),
+    timeRoutes = require("./api/time/timeRoutes");
 
 scriptsUtils.connectToDb(scriptsUtils.getMongoDbUriFromEnv());
 
@@ -28,6 +29,7 @@ app.use(bodyParser.json());
 statusRoutes(app);
 userRoutes(app);
 contactRoutes(app);
+timeRoutes(app);
 app.use(middleware.userAuth);
 userRoutesWithAuth(app);
 tripRoutes(app);

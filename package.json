@@ -29,7 +29,7 @@
     "dependencies": {
         "activator": "^3.0.2",
         "async": "^3.2.4",
-        "bcrypt": "^5.1.0",
+        "bcrypt": "^6.0.0",
         "body-parser": "^1.20.2",
         "cors": "^2.8.5",
         "env-cmd": "^10.1.0",

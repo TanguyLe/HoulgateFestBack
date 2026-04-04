@@ -1,6 +1,6 @@
 {
     "name": "houlgatefestback",
-    "version": "0.5.0",
+    "version": "0.5.1",
     "description": "Back of the website for the HoulgateFest project",
     "license": "MIT",
     "authors": [
@@ -33,7 +33,7 @@
         "body-parser": "^1.20.2",
         "cors": "^2.8.5",
         "env-cmd": "^10.1.0",
-        "express": "^4.19.2",
+        "express": "^4.22.1",
         "jsonwebtoken": "^9.0.0",
         "mongoose": "^7.5.0",
         "node": "18.16.0",

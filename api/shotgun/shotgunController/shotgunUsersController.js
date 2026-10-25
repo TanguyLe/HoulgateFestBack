@@ -10,6 +10,8 @@ exports.shotgunUsers = (shotgun, userOwner, updateRoommates, roomId, callback) =
     console.log("Shotgun all users  ...");
 
     let stackUpdateUsers = [];
+    // users this request marked as shotgun, the only ones to roll back on error
+    let claimedUsers = [];
 
     // Create tasks for checking and updating the users
     // update the user Owner
@@ -49,6 +51,7 @@ exports.shotgunUsers = (shotgun, userOwner, updateRoommates, roomId, callback) =
                 user.save()
                     .then((user) => {
                         console.log("User " + user.username + " has shotgun.");
+                        claimedUsers.push(user._id);
                         callback();
                     })
                     .catch((err) => {
@@ -86,6 +89,7 @@ exports.shotgunUsers = (shotgun, userOwner, updateRoommates, roomId, callback) =
                     user.save()
                         .then((user) => {
                             console.log("User " + user.username + " has shotgun.");
+                            claimedUsers.push(user._id);
                             callback(null, user._id);
                         })
                         .catch((err) => {
@@ -114,10 +118,11 @@ exports.shotgunUsers = (shotgun, userOwner, updateRoommates, roomId, callback) =
         (error, foundRoommatesId) => {
             if (error) {
                 console.error("-> Error before shotgun users : " + error);
-                // rolling back the users
-                let updateUsers = updateRoommates;
-                updateUsers.push(userOwner.email);
-                rollback.rollBackUsers(updateUsers, roomId, (err) => {
+                // nothing was changed (e.g. the requester isn't the owner): don't touch anyone
+                if (claimedUsers.length === 0) return callback(error);
+
+                // rolling back the users updated by this request
+                rollback.rollBackUsers(claimedUsers, roomId, (err) => {
                     if (err) {
                         return callback(err);
                     }

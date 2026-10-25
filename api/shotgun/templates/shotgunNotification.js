@@ -1,3 +1,5 @@
+let { escapeHtml } = require("../../utils/html");
+
 exports.getShotgunNotificationContent = (owner, room, users) => {
     return `<head>
             <style>
@@ -8,9 +10,9 @@ exports.getShotgunNotificationContent = (owner, room, users) => {
         <p>
         Récapitulatif de ton shotgun:
             <ul>
-                <li>${owner} a réservé la chambre "${room}"</li>
+                <li>${escapeHtml(owner)} a réservé la chambre "${room}"</li>
                 <li> Compagnons de chambre :
-                    <ul>${users.map((user) => `<li>${user}</li>`).join("")}</ul>
+                    <ul>${users.map((user) => `<li>${escapeHtml(user)}</li>`).join("")}</ul>
                 </li>
         </p>
         <b>Merci et à bientôt!</b>

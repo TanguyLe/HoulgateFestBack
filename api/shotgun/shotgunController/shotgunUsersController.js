@@ -5,6 +5,23 @@ let mongoose = require("mongoose"),
     errors = require("../../utils/errors"),
     async = require("async");
 
+let getAlreadyShotgunError = (username) => {
+    console.error("-> User " + username + " has already shotgun");
+    let error = new Error("User " + username + " has already shotgun.");
+    error.name = "Error 409 : Conflict";
+    error.httpStatusCode = "409";
+    return error;
+};
+
+// Marks the user as shotgun in the room only if they haven't already shotgun, in a single update,
+// so two concurrent shotguns can't both claim the same user
+let claimUser = (userId, roomId) =>
+    User.findOneAndUpdate(
+        { _id: userId, hasShotgun: false },
+        { hasShotgun: true, room: roomId },
+        { new: true }
+    );
+
 // Shotgun all users
 exports.shotgunUsers = (shotgun, userOwner, updateRoommates, roomId, callback) => {
     console.log("Shotgun all users  ...");
@@ -36,22 +53,12 @@ exports.shotgunUsers = (shotgun, userOwner, updateRoommates, roomId, callback) =
                     return callback(error);
                 }
 
-                // check that user hasn't already shotgun
-                if (user.hasShotgun) {
-                    console.error("-> User " + user.username + " has already shotgun");
-                    let error = new Error("User " + user.username + " has already shotgun.");
-                    error.name = "Error 409 : Conflict";
-                    error.httpStatusCode = "409";
-                    return callback(error);
-                }
+                claimUser(user._id, roomId)
+                    .then((claimedUser) => {
+                        if (!claimedUser) return callback(getAlreadyShotgunError(user.username));
 
-                user.hasShotgun = true;
-                user.room = roomId;
-
-                user.save()
-                    .then((user) => {
                         console.log("User " + user.username + " has shotgun.");
-                        claimedUsers.push(user._id);
+                        claimedUsers.push(claimedUser._id);
                         callback();
                     })
                     .catch((err) => {
@@ -69,35 +76,19 @@ exports.shotgunUsers = (shotgun, userOwner, updateRoommates, roomId, callback) =
     updateRoommates.forEach((item) => {
         let updateRoommate = (callback) => {
             console.log("Trying to update user:" + item);
-            User.findById(item)
+            claimUser(item, roomId)
                 .then((user) => {
-                    console.log(item);
-                    if (!user) return callback(userError.getUserNotFoundError("id", item));
-
-                    // check that user hasn't already shotgun
-                    if (user.hasShotgun) {
-                        console.error("-> User " + user.username + " has already shotgun");
-                        let error = new Error("User " + user.username + " has already shotgun.");
-                        error.name = "Error 409 : Conflict";
-                        error.httpStatusCode = "409";
-                        return callback(error);
+                    if (user) {
+                        console.log("User " + user.username + " has shotgun.");
+                        claimedUsers.push(user._id);
+                        return callback(null, user._id);
                     }
 
-                    user.hasShotgun = true;
-                    user.room = roomId;
-
-                    user.save()
-                        .then((user) => {
-                            console.log("User " + user.username + " has shotgun.");
-                            claimedUsers.push(user._id);
-                            callback(null, user._id);
-                        })
-                        .catch((err) => {
-                            console.error("-> User " + user.username + " could not be udpated.");
-                            return callback(
-                                errors.getServerError("Couldn't save " + user.username)
-                            );
-                        });
+                    // not claimed: either unknown or already shotgun
+                    return User.findById(item).then((user) => {
+                        if (!user) return callback(userError.getUserNotFoundError("id", item));
+                        callback(getAlreadyShotgunError(user.username));
+                    });
                 })
                 .catch((err) => {
                     return callback(err);

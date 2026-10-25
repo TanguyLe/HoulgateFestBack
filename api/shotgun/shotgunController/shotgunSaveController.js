@@ -23,6 +23,13 @@ exports.savePreShotgun = (userId, room, callback) => {
                         callback(null, shotgun);
                     })
                     .catch((err) => {
+                        // duplicate key: a concurrent request got this room or this user first
+                        if (err.code === 11000) {
+                            let error = new Error("Room already shotgun or user already owns one.");
+                            error.name = "Error 409 : Conflict";
+                            error.httpStatusCode = "409";
+                            return callback(error);
+                        }
                         callback(err);
                     });
             },
@@ -95,7 +102,7 @@ exports.savePreShotgun = (userId, room, callback) => {
             },
         ],
         (err, shotgun) => {
-            if (err) callback(err);
+            if (err) return callback(err);
             callback(null, shotgun);
         }
     );

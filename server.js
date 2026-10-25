@@ -40,11 +40,4 @@ shotgunRoutes(app);
 
 app.use(middleware.notFound);
 
-app.listen(port, () =>
-    console.log(
-        "HoulgateFestBack server started on: " +
-            port +
-            "\nMongoDB is: " +
-            scriptsUtils.getMongoDbUriFromEnv()
-    )
-);
+app.listen(port, () => console.log("HoulgateFestBack server started on: " + port));

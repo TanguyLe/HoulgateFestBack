@@ -286,15 +286,14 @@ exports.shotgunDelete = (req, res) => {
                 // roll back the user owner
                 let updateUserOwner = (shotgun, callback) => {
                     // special tratment for user owner
-                    User.findByIdAndUpdate(
-                        shotgun.user,
-                        { hasShotgun: false, hasPreShotgun: false, room: null },
-                        (err, user) => {
-                            if (err) return callback(err);
-                            console.log("User " + user.username + " rolled back.");
-                            callback();
-                        }
-                    );
+                    User.findByIdAndUpdate(shotgun.user, {
+                        hasShotgun: false,
+                        hasPreShotgun: false,
+                        room: null,
+                    }).then((user) => {
+                        console.log("User " + user.username + " rolled back.");
+                        callback();
+                    }, callback);
                 };
 
                 async.parallel(

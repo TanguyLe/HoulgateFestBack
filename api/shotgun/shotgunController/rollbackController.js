@@ -5,10 +5,8 @@ let mongoose = require("mongoose"),
     async = require("async");
 const errors = require("../../utils/errors");
 
-let handleUserRollback = (item, callback) => {
-    return (err, user) => {
-        if (err) return callback(err);
-
+let handleUserRollback = (item, roomId, callback) => {
+    return (user) => {
         if (!user) {
             console.error("-> User with ID " + item + " not found. Not rolled back.");
             return callback();
@@ -50,15 +48,12 @@ let rollBackUsers = (users, roomId, callback) => {
 
     users.forEach((item) => {
         // depending on the data type representing the user (email or id), we call findById or findOne
-        if (item instanceof mongoose.Types.ObjectId)
-            updateUser = (callback) =>
-                User.findById(item).then(handleUserRollback(item, callback)).catch(callback);
-        else
-            updateUser = async (callback) => {
-                const user = await User.findOne({ email: item })
-                    .then(handleUserRollback(item, callback))
-                    .catch(callback);
-            };
+        // (ids from a request body are strings)
+        let isId = item instanceof mongoose.Types.ObjectId || /^[0-9a-fA-F]{24}$/.test(item);
+        updateUser = (callback) =>
+            (isId ? User.findById(item) : User.findOne({ email: item }))
+                .then(handleUserRollback(item, roomId, callback))
+                .catch(callback);
         stackUpdateUsers.push(updateUser);
     });
 

@@ -2,6 +2,7 @@ let mongoose = require("mongoose"),
     User = mongoose.model("Users"),
     passwordUtils = require("../utils/password"),
     labels = require("../../labels"),
+    { sendServerError } = require("../utils/errors"),
     tokenUtils = require("../utils/token");
 
 const fillUserAndTokens = (user, res) => {
@@ -42,7 +43,7 @@ exports.login = (req, res) => {
                 });
         },
         (err) => {
-            res.json(err);
+            sendServerError(res, err);
         }
     );
 };
@@ -79,7 +80,7 @@ exports.createUser = (req, res, next) => {
                     });
                 }
             },
-            (err) => res.send(err)
+            (err) => sendServerError(res, err)
         );
     });
 };
@@ -97,7 +98,7 @@ exports.afterCompleteActivation = (req, res) => {
             fillUserAndTokens(user, res);
         })
         .catch((err) => {
-            res.send(err);
+            sendServerError(res, err);
         });
 };
 
@@ -110,7 +111,7 @@ exports.readUser = (req, res) => {
             });
         })
         .catch((err) => {
-            res.send(err);
+            sendServerError(res, err);
         });
 };
 
@@ -131,7 +132,7 @@ exports.beforeCreatePasswordReset = (req, res, next) => {
             next();
         },
         (err) => {
-            res.json(err);
+            sendServerError(res, err);
         }
     );
 };

@@ -1,5 +1,6 @@
 let mail = require("../mail/mailController"),
-    { escapeHtml } = require("../utils/html");
+    { escapeHtml } = require("../utils/html"),
+    { sendServerError } = require("../utils/errors");
 
 exports.send = (req, res) => {
     try {
@@ -52,7 +53,6 @@ exports.send = (req, res) => {
             });
         });
     } catch (err) {
-        console.error("Catch error :" + err);
-        return res.status(500).send(err);
+        return sendServerError(res, err);
     }
 };

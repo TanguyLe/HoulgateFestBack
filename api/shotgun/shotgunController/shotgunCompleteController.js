@@ -22,7 +22,7 @@ exports.completeShotgun = (roomId, roommatesId, callback) => {
         { new: true }
     )
         .then((shotgun) => {
-            if (!shotgun) return callback(shotgunErrors.getShotgunNotFoundError(req.params.roomID));
+            if (!shotgun) return callback(shotgunErrors.getShotgunNotFoundError(roomId));
 
             // delete all shotguns own by the roommates
             if (roommatesId && roommatesId.length > 0) {

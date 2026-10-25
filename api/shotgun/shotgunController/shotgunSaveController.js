@@ -52,8 +52,10 @@ exports.savePreShotgun = (userId, room, callback) => {
                             { new: true }
                         )
                             .then((foundUser) => {
-                                if (err)
-                                    if (!foundUser) return callback(userErrors("id", shotgun.user));
+                                if (!foundUser)
+                                    return callback(
+                                        userErrors.getUserNotFoundError("id", shotgun.user)
+                                    );
 
                                 console.log("...User " + foundUser.username + " is updated.");
                                 callback(null, shotgun);
@@ -72,9 +74,10 @@ exports.savePreShotgun = (userId, room, callback) => {
                         { new: true }
                     )
                         .then((foundUser) => {
-                            if (!foundUser) {
-                                callback(userErrors("id", shotgun.user));
-                            }
+                            if (!foundUser)
+                                return callback(
+                                    userErrors.getUserNotFoundError("id", shotgun.user)
+                                );
 
                             console.log("...User " + foundUser.username + " is updated.");
                             callback(null, shotgun);

@@ -1,6 +1,7 @@
 let tokenUtils = require("./token"),
     labels = require("../../labels"),
-    editionController = require("../edition/editionController");
+    editionController = require("../edition/editionController"),
+    { sendServerError } = require("./errors");
 
 exports.userAuth = (req, res, next) => {
     req.user = null;
@@ -25,11 +26,15 @@ exports.userAuth = (req, res, next) => {
 exports.hasStarted = (req, res, next) => {
     if (process.env.HAS_STARTED === "1") next();
     else {
-        editionController.getEditions((editions) => {
-            const currentEdition = editionController.getCurrentEditionFromEditions(editions);
-            if (currentEdition !== undefined && new Date() > currentEdition.shotgunDate) next();
-            else res.status(400).send({ message: "Shotgun has not started yet" });
-        });
+        editionController.getEditions(
+            (editions) => {
+                const currentEdition = editionController.getCurrentEditionFromEditions(editions);
+                if (currentEdition !== undefined && new Date() > currentEdition.shotgunDate) next();
+                else res.status(400).send({ message: "Shotgun has not started yet" });
+            },
+            // without this the request never got an answer when the editions couldn't be read
+            (err) => sendServerError(res, err)
+        );
     }
 };
 

@@ -9,6 +9,7 @@ let express = require("express"),
     Edition = require("./api/edition/editionModel"),
     Trip = require("./api/trip/tripModel"),
     middleware = require("./api/utils/middleware"),
+    rateLimits = require("./api/utils/rateLimits"),
     scriptsUtils = require("./scripts/scriptsUtils"),
     statusRoutes = require("./api/status/statusRoutes"),
     userRoutes = require("./api/user/userRoutes"),
@@ -25,6 +26,13 @@ scriptsUtils.connectToDb(scriptsUtils.getMongoDbUriFromEnv());
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+// Behind Vercel's proxy: trust its X-Forwarded-For so rate limits apply to the client IP
+app.set("trust proxy", 1);
+app.post("/login", rateLimits.login);
+app.post("/users", rateLimits.signUp);
+app.post("/passwordReset", rateLimits.passwordReset);
+app.post("/contact", rateLimits.contact);
 
 statusRoutes(app);
 userRoutes(app);

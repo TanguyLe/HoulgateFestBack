@@ -1,0 +1,40 @@
+name: CI
+
+# main is deployed to production on every push, so every PR must leave it deployable.
+on:
+    pull_request:
+        branches: [main]
+    push:
+        branches: [main]
+
+jobs:
+    check:
+        runs-on: ubuntu-latest
+
+        services:
+            mongo:
+                image: mongo:7
+                ports:
+                    - 27017:27017
+
+        env:
+            MONGO_CONNECTION: mongodb://localhost:27017/Userdb
+            REFRESH_TOKEN_SECRET: ci-secret
+            PORT: 3000
+
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version-file: package.json
+                  cache: npm
+            - run: npm ci
+            - run: npm run prettier-check
+            - name: Boot smoke test
+              run: |
+                  node server.js &
+                  for i in $(seq 30); do
+                      curl -sf http://localhost:3000/status | grep -q '"mongoDB":"connected"' && exit 0
+                      sleep 1
+                  done
+                  echo "Server did not report a connected MongoDB within 30s" && exit 1

@@ -6,13 +6,24 @@ authentication/logging and whose main feature is to be able to "shotgun" (reserv
 
 It is meant to work alongside its frontend : https://github.com/TanguyLe/HoulgateFestFront.
 
+## Workflow & deployment
+
+This repository is trunk-based: `main` is the only long-lived branch and it is what runs in production.
+
+1. Branch off `main` and open a pull request against `main`.
+2. CI (prettier and a boot smoke test against MongoDB) must pass; Vercel builds a preview deployment for the PR.
+3. Merging the PR deploys it to production automatically. There is no release step,
+   no version bump and no changelog to update: the history of merged PRs is the changelog.
+
+Because every merge ships, keep PRs small and make sure `main` always stays deployable.
+
 ## Installation
 
 ### Prerequisites
 
-1. Node and npm installed, recommended versions are node 12.13.1 and npm 6.12.1.
+1. Node >= 24.22.1 (see `engines` in `package.json`) and npm.
 2. Repo cloned.
-3. MongoDB installed and started, recommended version is 4.2. You can also use a remote mongodb.
+3. MongoDB installed and started, recommended version is 7. You can also use a remote mongodb.
 
 ### Packages
 

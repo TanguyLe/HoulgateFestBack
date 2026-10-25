@@ -22,7 +22,8 @@ let express = require("express"),
 
 scriptsUtils.connectToDb(scriptsUtils.getMongoDbUriFromEnv());
 
-app.use(cors());
+// Only the front may call the API from a browser (falls back to any origin if FRONT_HOST is unset)
+app.use(cors({ origin: (process.env.FRONT_HOST || "*").replace(/\/$/, "") }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 

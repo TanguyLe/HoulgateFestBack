@@ -62,9 +62,9 @@ All the backend servers are served by default at `http://localhost:3000/`.
 1. `npm run initDB`: Fills the db with the data of the house (rooms) and the editions.
    To be executed only once (static data).
 2. `npm run createTestRecords`: Fills the db with some test records
-   (users & trips) whose data is [here](./scripts/scriptsUtils.js).
+   (users) whose data is [here](./scripts/scriptsUtils.js).
 3. `npm run removeTestRecords`: Cleans the db by removing eventual
-   test records (users, shotguns & trips from test users).
+   test records (users & shotguns from test users).
 4. `npm run removeTestShotguns`: Removes only test shotguns.
 5. `npm run historizeShotguns`: To remove actual shotguns and historize them.
 

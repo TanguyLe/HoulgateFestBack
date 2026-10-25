@@ -21,11 +21,19 @@ let express = require("express"),
 
 scriptsUtils.connectToDb(scriptsUtils.getMongoDbUriFromEnv());
 
-// Only the front may call the API from a browser: without FRONT_HOST, no cross-origin call is allowed
+// Only the front may call the API from a browser: without FRONT_HOST, only front previews are allowed
 if (!process.env.FRONT_HOST)
-    console.warn("FRONT_HOST is not set: cross-origin requests are refused");
+    console.warn("FRONT_HOST is not set: only front preview origins are allowed");
+// Front preview deployments (one URL per branch/commit) are allowed too: only our Vercel team can deploy there
+const frontPreviewOrigin =
+    /^https:\/\/houlgate-fest-front-[a-z0-9-]+-tanguy-le-flochs-projects\.vercel\.app$/;
 app.use(
-    cors({ origin: process.env.FRONT_HOST ? process.env.FRONT_HOST.replace(/\/$/, "") : false })
+    cors({
+        origin: [
+            ...(process.env.FRONT_HOST ? [process.env.FRONT_HOST.replace(/\/$/, "")] : []),
+            frontPreviewOrigin,
+        ],
+    })
 );
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());

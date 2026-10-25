@@ -18,8 +18,9 @@ const fillUserAndTokens = (user, res) => {
     });
 };
 
+// Emails are cast to strings so a JSON body like {"$ne": null} can't inject query operators
 exports.login = (req, res) => {
-    User.findOne({ email: req.body.email }).then(
+    User.findOne({ email: String(req.body.email) }).then(
         (user) => {
             if (!user)
                 return res
@@ -53,7 +54,7 @@ exports.createUser = (req, res, next) => {
 
         let newUser = new User(newUserInfo);
 
-        User.findOne({ email: newUserInfo.email }).then(
+        User.findOne({ email: String(newUserInfo.email) }).then(
             (user) => {
                 if (!user) {
                     newUser.save().then(
@@ -111,7 +112,7 @@ exports.readUser = (req, res) => {
 };
 
 exports.beforeCreatePasswordReset = (req, res, next) => {
-    User.findOne({ email: req.body.email }).then(
+    User.findOne({ email: String(req.body.email) }).then(
         (user) => {
             if (!user)
                 return res

@@ -1,7 +1,7 @@
 let mongoose = require("mongoose"),
     User = mongoose.model("Users");
 
-// checks user exists and hasn't shotgun or isn't the owner of another shotgun
+// checks user exists, is activated and hasn't shotgun or isn't the owner of another shotgun
 exports.checkUserOK = (userEmail, callback) => {
     console.log("Check user OK...");
 
@@ -13,6 +13,14 @@ exports.checkUserOK = (userEmail, callback) => {
                 let error = new Error("No user with email " + userEmail + " found.");
                 error.name = "Error 400 : Query parameter error";
                 error.httpStatusCode = "400";
+                return callback(error);
+            }
+
+            // an access token stays valid after the account is deactivated, so check it here too
+            if (!foundUser.activated) {
+                let error = new Error("User " + foundUser.username + " is not activated.");
+                error.name = "Error 403 : Forbidden";
+                error.httpStatusCode = "403";
                 return callback(error);
             }
 

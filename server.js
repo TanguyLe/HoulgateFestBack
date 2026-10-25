@@ -7,7 +7,6 @@ let express = require("express"),
     Room = require("./api/room/roomModel"),
     Shotgun = require("./api/shotgun/shotgunModel"),
     Edition = require("./api/edition/editionModel"),
-    Trip = require("./api/trip/tripModel"),
     middleware = require("./api/utils/middleware"),
     scriptsUtils = require("./scripts/scriptsUtils"),
     statusRoutes = require("./api/status/statusRoutes"),
@@ -16,7 +15,6 @@ let express = require("express"),
     editionRoutes = require("./api/edition/editionRoutes"),
     roomRoutes = require("./api/room/roomRoutes"),
     shotgunRoutes = require("./api/shotgun/shotgunRoutes"),
-    tripRoutes = require("./api/trip/tripRoutes"),
     contactRoutes = require("./api/contact/contactRoutes"),
     timeRoutes = require("./api/time/timeRoutes");
 
@@ -32,7 +30,6 @@ contactRoutes(app);
 timeRoutes(app);
 app.use(middleware.userAuth);
 userRoutesWithAuth(app);
-tripRoutes(app);
 editionRoutes(app);
 app.use(middleware.hasStarted);
 roomRoutes(app);

@@ -37,15 +37,20 @@ exports.config = {
                 });
         },
         setPassword: (id, password, callback) => {
-            passwordUtils.cryptPassword(password).then((resPassword) => {
-                User.updateOne({ _id: new mongo.ObjectId(id) }, { $set: { password: resPassword } })
-                    .then((obj) => {
-                        callback(null, obj);
-                    })
-                    .catch((err) => {
-                        callback(err, null);
-                    });
-            });
+            passwordUtils
+                .cryptPassword(password)
+                .then((resPassword) =>
+                    User.updateOne(
+                        { _id: new mongo.ObjectId(id) },
+                        { $set: { password: resPassword } }
+                    )
+                )
+                .then((obj) => {
+                    callback(null, obj);
+                })
+                .catch((err) => {
+                    callback(err, null);
+                });
         },
     },
     emailProperty: "email",

@@ -19,8 +19,14 @@ const fillUserAndTokens = (user, res) => {
     });
 };
 
+// bcrypt rejects non-string passwords, which would crash the server as an unhandled rejection
+const isPassword = (password) => typeof password === "string" && password.length > 0;
+
 // Emails are cast to strings so a JSON body like {"$ne": null} can't inject query operators
 exports.login = (req, res) => {
+    if (!isPassword(req.body.password))
+        return res.status(400).json({ wrongField: "password", message: "Password required" });
+
     User.findOne({ email: String(req.body.email) }).then(
         (user) => {
             if (!user)
@@ -40,7 +46,8 @@ exports.login = (req, res) => {
                         });
 
                     fillUserAndTokens(user, res);
-                });
+                })
+                .catch((err) => sendServerError(res, err));
         },
         (err) => {
             sendServerError(res, err);
@@ -49,6 +56,9 @@ exports.login = (req, res) => {
 };
 
 exports.createUser = (req, res, next) => {
+    if (!isPassword(req.body.password))
+        return res.status(400).json({ errors: { password: { message: "Password required" } } });
+
     passwordUtils.cryptPassword(req.body.password).then((resPassword) => {
         // Only pick the fields a user may set, so `activated`, `hasShotgun`, `room`... can't be forged
         let newUserInfo = {

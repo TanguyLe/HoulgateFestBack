@@ -15,7 +15,14 @@ let getServerError = (msg) => {
     return error;
 };
 
+// Logs the error and answers a generic 500, so internals (stack, DB details) aren't sent to the client
+let sendServerError = (res, err) => {
+    console.error(err);
+    res.status(500).send({ message: "Internal server error" });
+};
+
 module.exports = {
     getObjectNotFoundError: getObjectNotFoundError,
     getServerError: getServerError,
+    sendServerError: sendServerError,
 };

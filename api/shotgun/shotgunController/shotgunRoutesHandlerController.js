@@ -16,6 +16,17 @@ let mongoose = require("mongoose"),
     timeout = require("./timeoutController"),
     async = require("async");
 
+const isObjectId = (value) => typeof value === "string" && /^[0-9a-fA-F]{24}$/.test(value);
+
+let sendBadParameter = (res, message) =>
+    res.status(400).send({
+        meta: {
+            error_type: "Error 400 : Query parameter error",
+            code: "400",
+            error_message: message,
+        },
+    });
+
 // Handle Shotgun create on POST.
 exports.shotgunCreatePost = (req, res) => {
     // Validate Request
@@ -187,6 +198,8 @@ exports.shotgunDelete = (req, res) => {
             },
         });
     }
+
+    if (!isObjectId(req.params.roomId)) return sendBadParameter(res, "RoomId is not an ObjectId");
 
     console.log("Deleting Shotgun...");
     async.waterfall(
@@ -395,6 +408,17 @@ exports.roommatesAdd = (req, res, next) => {
             },
         });
     }
+
+    if (!isObjectId(req.params.roomId)) return sendBadParameter(res, "RoomId is not an ObjectId");
+
+    // The roommates are iterated and saved one by one, so reject anything but a list of distinct user ids
+    let roommates = req.body.roommates;
+    if (
+        !Array.isArray(roommates) ||
+        !roommates.every(isObjectId) ||
+        new Set(roommates).size !== roommates.length
+    )
+        return sendBadParameter(res, "Roommates must be a list of distinct user ids");
 
     /* Add roommates */
     let updateUsers = req.body.roommates;

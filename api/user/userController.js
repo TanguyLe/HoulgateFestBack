@@ -100,7 +100,6 @@ exports.readUser = (req, res) => {
     User.findById(req.params.userId)
         .then((user) => {
             res.json({
-                email: user.email,
                 username: user.username,
                 activated: user.activated,
             });
@@ -174,7 +173,7 @@ exports.refreshLogin = (req, res) => {
 
 // Display list of all users.
 exports.userList = (req, res) => {
-    User.find({}, { password: 0, __v: 0 })
+    User.find({}, { password: 0, email: 0, __v: 0 })
         .then((users) => {
             res.status(200).send({
                 meta: {

@@ -432,7 +432,7 @@ exports.roommatesAdd = (req, res, next) => {
                         password: 0,
                         __v: 0,
                     })
-                    .populate("roommates", { password: 0, __v: 0 })
+                    .populate("roommates", { password: 0, email: 0, __v: 0 })
                     .exec()
                     .then(
                         (populatedShotgun) => {

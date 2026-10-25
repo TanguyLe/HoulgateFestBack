@@ -1,6 +1,9 @@
 module.exports = (app) => {
     let shotgunController = require("./shotgunController/shotgunRoutesHandlerController"),
-        shotgunCompleteController = require("./shotgunController/shotgunCompleteController");
+        shotgunCompleteController = require("./shotgunController/shotgunCompleteController"),
+        timeout = require("./shotgunController/timeoutController");
+
+    app.use("/shotgun", timeout.expireStaleShotguns);
 
     app.route("/shotgun/rooms").get(shotgunController.roomList);
 

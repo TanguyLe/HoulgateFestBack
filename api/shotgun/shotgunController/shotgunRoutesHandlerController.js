@@ -133,12 +133,12 @@ exports.shotgunCreatePost = (req, res) => {
         ],
         (err, shotgun) => {
             if (err) {
-                return res.status(err.httpStatusCode || 500).send({
+                if (!err.httpStatusCode) return errors.sendServerError(res, err);
+                return res.status(err.httpStatusCode).send({
                     meta: {
                         error_type: err.name,
-                        code: err.httpStatusCode || "500",
-                        error_message:
-                            err.message || "Some error occurred while creating the Shotgun.",
+                        code: err.httpStatusCode,
+                        error_message: err.message,
                     },
                 });
             }
@@ -309,12 +309,12 @@ exports.shotgunDelete = (req, res) => {
         (err) => {
             if (err) {
                 console.error("-> Error while deleting from DB.");
-                return res.status(err.httpStatusCode || 500).send({
+                if (!err.httpStatusCode) return errors.sendServerError(res, err);
+                return res.status(err.httpStatusCode).send({
                     meta: {
                         error_type: err.name,
-                        code: err.httpStatusCode || "500",
-                        error_message:
-                            err.message || "Some error occurred while deleting the Shotgun.",
+                        code: err.httpStatusCode,
+                        error_message: err.message,
                     },
                 });
             }
@@ -343,16 +343,7 @@ exports.roomList = (req, res) => {
                     data: foundShotguns,
                 });
             },
-            (err) => {
-                return res.status("500").send({
-                    meta: {
-                        error_type: "Error 500 : Internal Server Error",
-                        code: "500",
-                        error_message:
-                            err.message || "Some error occurred while retrieving shotguns.",
-                    },
-                });
-            }
+            (err) => errors.sendServerError(res, err)
         );
 };
 
@@ -458,13 +449,13 @@ exports.roommatesAdd = (req, res, next) => {
                             error_message: "Shotgun not found with id " + req.params.roomId,
                         },
                     });
-                } else
-                    return res.status(err.httpStatusCode || 500).send({
+                } else if (!err.httpStatusCode) return errors.sendServerError(res, err);
+                else
+                    return res.status(err.httpStatusCode).send({
                         meta: {
                             error_type: err.name,
-                            code: err.httpStatusCode || "500",
-                            error_message:
-                                err.message || "Some error occurred while adding the roommates ",
+                            code: err.httpStatusCode,
+                            error_message: err.message,
                         },
                     });
             }

@@ -1,4 +1,5 @@
-let editionController = require("./editionController");
+let editionController = require("./editionController"),
+    { sendServerError } = require("../utils/errors");
 
 const getEditions = (req, res) => {
     editionController.getEditions(
@@ -15,11 +16,7 @@ const getEditions = (req, res) => {
                         : editions,
             });
         },
-        (err) => {
-            res.status(500).send({
-                message: err.message || "Some error occurred while retrieving editions.",
-            });
-        }
+        (err) => sendServerError(res, err)
     );
 };
 

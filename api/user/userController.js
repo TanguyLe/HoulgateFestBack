@@ -188,13 +188,5 @@ exports.userList = (req, res) => {
                 data: users,
             });
         })
-        .catch((err) => {
-            res.status(500).send({
-                meta: {
-                    error_type: "Error 500 : Internal Server Error",
-                    code: "500",
-                    error_message: err.message || "Some error occurred while retrieving users.",
-                },
-            });
-        });
+        .catch((err) => sendServerError(res, err));
 };

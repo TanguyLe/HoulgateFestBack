@@ -1,5 +1,6 @@
 let mongoose = require("mongoose"),
-    Room = mongoose.model("Rooms");
+    Room = mongoose.model("Rooms"),
+    { sendServerError } = require("../../utils/errors");
 
 // Display list of all rooms.
 exports.roomList = (req, res) => {
@@ -12,9 +13,5 @@ exports.roomList = (req, res) => {
                 data: rooms,
             });
         })
-        .catch((err) => {
-            res.status(500).send({
-                message: err.message || "Some error occurred while retrieving rooms.",
-            });
-        });
+        .catch((err) => sendServerError(res, err));
 };

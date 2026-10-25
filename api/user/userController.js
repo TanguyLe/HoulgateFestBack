@@ -48,8 +48,12 @@ exports.login = (req, res) => {
 
 exports.createUser = (req, res, next) => {
     passwordUtils.cryptPassword(req.body.password).then((resPassword) => {
-        let newUserInfo = req.body;
-        newUserInfo.password = resPassword;
+        // Only pick the fields a user may set, so `activated`, `hasShotgun`, `room`... can't be forged
+        let newUserInfo = {
+            email: req.body.email,
+            username: req.body.username,
+            password: resPassword,
+        };
 
         let newUser = new User(newUserInfo);
 

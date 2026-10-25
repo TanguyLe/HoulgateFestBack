@@ -1,10 +1,16 @@
-let mail = require("../mail/mailController");
+let mail = require("../mail/mailController"),
+    { escapeHtml } = require("../utils/html");
 
 exports.send = (req, res) => {
     try {
-        let title = `Mail de ${req.body.mailContent.firstname} ${req.body.mailContent.lastname}`;
-        let content = `Joignable au ${req.body.mailContent.phone}, ou par mel au ${req.body.mailContent.mail}.
-            Contenu de la demande : ${req.body.mailContent.content}`;
+        // mailSender sends the text as HTML, so every user-provided field is escaped
+        let form = {};
+        for (let field of ["firstname", "lastname", "phone", "mail", "content"])
+            form[field] = escapeHtml(req.body.mailContent[field]);
+
+        let title = `Mail de ${form.firstname} ${form.lastname}`;
+        let content = `Joignable au ${form.phone}, ou par mel au ${form.mail}.
+            Contenu de la demande : ${form.content}`;
         let mailContent = {
             to: "houlgatefest@gmail.com",
             subject: title,
@@ -27,7 +33,7 @@ exports.send = (req, res) => {
                 to: req.body.mailContent.mail,
                 subject: "Demande de contact reçue",
                 text: `Nous avons bien reçu votre demande. Ci-joint une copie du message envoyé : 
-                "${req.body.mailContent.content}"`,
+                "${form.content}"`,
             };
 
             mail.mailSender(contactAnswer, (err) => {

@@ -32,8 +32,15 @@ exports.generateRefreshToken = (accessToken) => {
     return refreshToken;
 };
 
+// The activation and password reset codes are signed with the same secret (see userActivator),
+// so only tokens carrying the access token fields are accepted
 exports.checkAccessToken = (accessToken, callbackFct, ignoreExpiration) => {
-    jwt.verify(accessToken, secret, { ignoreExpiration: ignoreExpiration }, callbackFct);
+    jwt.verify(accessToken, secret, { ignoreExpiration: ignoreExpiration }, (err, decode) => {
+        if (!err && (!decode.username || !decode.email))
+            err = new jwt.JsonWebTokenError("not an access token");
+
+        callbackFct(err, err ? undefined : decode);
+    });
 };
 
 exports.checkIfAccessTokenExpired = (accessToken) => {

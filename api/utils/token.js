@@ -1,14 +1,11 @@
-let jwt = require("jsonwebtoken");
+let crypto = require("crypto"),
+    jwt = require("jsonwebtoken");
 
 let secret = process.env.REFRESH_TOKEN_SECRET;
 let refreshTokens = {};
 
-let rand = () => {
-    return Math.random().toString(36).substr(2);
-};
-
 let randomToken = () => {
-    return rand() + rand();
+    return crypto.randomBytes(32).toString("hex");
 };
 
 exports.getJWTToken = (headers) => {

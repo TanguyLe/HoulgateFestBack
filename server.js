@@ -21,8 +21,12 @@ let express = require("express"),
 
 scriptsUtils.connectToDb(scriptsUtils.getMongoDbUriFromEnv());
 
-// Only the front may call the API from a browser (falls back to any origin if FRONT_HOST is unset)
-app.use(cors({ origin: (process.env.FRONT_HOST || "*").replace(/\/$/, "") }));
+// Only the front may call the API from a browser: without FRONT_HOST, no cross-origin call is allowed
+if (!process.env.FRONT_HOST)
+    console.warn("FRONT_HOST is not set: cross-origin requests are refused");
+app.use(
+    cors({ origin: process.env.FRONT_HOST ? process.env.FRONT_HOST.replace(/\/$/, "") : false })
+);
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 

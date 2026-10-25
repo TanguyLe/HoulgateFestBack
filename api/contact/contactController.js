@@ -26,17 +26,7 @@ exports.send = (req, res) => {
         };
 
         mail.mailSender(mailContent, (err) => {
-            if (err) {
-                return res.status(err.httpStatusCode || 500).send({
-                    meta: {
-                        error_type: err.name || "Error 500 : Internal Server Error",
-                        code: err.httpStatusCode || "500",
-                        error_message:
-                            err.message ||
-                            "Some error occurred while sending contact request mail. Please retry later.",
-                    },
-                });
-            }
+            if (err) return sendServerError(res, err);
             let contactAnswer = {
                 to: replyTo,
                 subject: "Demande de contact reçue",
@@ -45,17 +35,7 @@ exports.send = (req, res) => {
             };
 
             mail.mailSender(contactAnswer, (err) => {
-                if (err) {
-                    return res.status(err.httpStatusCode || 500).send({
-                        meta: {
-                            error_type: err.name || "Error 500 : Internal Server Error",
-                            code: err.httpStatusCode || "500",
-                            error_message:
-                                err.message ||
-                                "Some error occurred while sending contact answer mail.",
-                        },
-                    });
-                }
+                if (err) return sendServerError(res, err);
                 return res.sendStatus(200);
             });
         });

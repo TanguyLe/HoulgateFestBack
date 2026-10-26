@@ -1,6 +1,8 @@
 let mongoose = require("mongoose"),
     User = mongoose.model("Users"),
     Edition = mongoose.model("Edition"),
+    Shotgun = mongoose.model("Shotguns"),
+    historizeController = require("../shotgun/shotgunController/historizeController"),
     { sendServerError } = require("../utils/errors");
 
 // Only these fields can be changed from the admin interface: emails and usernames stay the users'
@@ -136,6 +138,49 @@ exports.deleteEdition = (req, res) => {
 
             console.log("Admin " + req.admin.email + " deleted edition " + edition.year);
             sendData(res, edition);
+        })
+        .catch((err) => sendServerError(res, err));
+};
+
+// The current shotguns, and how many shotguns each edition already has in the history
+exports.shotgunList = (req, res) => {
+    Promise.all([
+        Shotgun.find({}, { __v: 0 })
+            .populate("room", "text")
+            .populate("user", "username")
+            .populate("roommates", "username"),
+        historizeController.getHistoryCounts(),
+    ])
+        .then(([shotguns, historyCounts]) =>
+            sendData(res, {
+                shotguns: shotguns,
+                historyCounts: historyCounts.reduce((counts, count) => {
+                    counts[count._id] = count.count;
+                    return counts;
+                }, {}),
+            })
+        )
+        .catch((err) => sendServerError(res, err));
+};
+
+exports.historizeShotguns = (req, res) => {
+    if (!mongoose.isValidObjectId(req.body.editionId)) return sendInvalidId(res);
+
+    Edition.findById(req.body.editionId)
+        .then((edition) => {
+            if (!edition) return res.status(404).send({ message: "Édition introuvable." });
+
+            return historizeController.historizeShotguns(edition).then((result) => {
+                console.log(
+                    "Admin " +
+                        req.admin.email +
+                        " historized the shotguns of " +
+                        edition.year +
+                        ": " +
+                        JSON.stringify(result)
+                );
+                sendData(res, result);
+            });
         })
         .catch((err) => sendServerError(res, err));
 };

@@ -8,6 +8,9 @@ module.exports = (app) => {
     app.route("/admin/users").get(admin.userList);
     app.route("/admin/users/:userId").put(admin.updateUser);
 
+    app.route("/admin/shotguns").get(admin.shotgunList);
+    app.route("/admin/shotguns/historize").post(admin.historizeShotguns);
+
     app.route("/admin/editions").get(admin.editionList).post(admin.createEdition);
     app.route("/admin/editions/:editionId").put(admin.updateEdition).delete(admin.deleteEdition);
 };

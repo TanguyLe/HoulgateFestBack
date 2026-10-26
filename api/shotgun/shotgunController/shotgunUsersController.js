@@ -30,6 +30,14 @@ let claimUser = (userId, roomId) =>
         { returnDocument: "after" },
     );
 
+// The users of a deleted shotgun no longer own nor sleep in its room. Only the ones still linked to
+// it are changed, in case one of them was moved to another room in the meantime.
+exports.freeUsers = (userIds, roomId) =>
+    User.updateMany(
+        { _id: { $in: userIds }, room: roomId },
+        { $set: { hasShotgun: false, hasPreShotgun: false, room: null } },
+    );
+
 // Shotgun all users
 exports.shotgunUsers = (shotgun, userOwner, updateRoommates, roomId, callback) => {
     console.log("Shotgun all users  ...");

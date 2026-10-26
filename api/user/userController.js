@@ -1,4 +1,5 @@
 let mongoose = require("mongoose"),
+    jwt = require("jsonwebtoken"),
     User = mongoose.model("Users"),
     passwordUtils = require("../utils/password"),
     labels = require("../../labels"),
@@ -131,7 +132,36 @@ exports.createActivateHandler = function (req, res, next) {
     res.status(201).send({});
 };
 
+// The activator "Next" handlers always call next(), even when they failed: their outcome is in
+// req.activator ({ code, message }) and must be checked before answering
+const activatorSucceeded = (req) => req.activator && req.activator.code < 300;
+
+// Errors activator gives for a wrong, tampered or expired activation / reset code
+const INVALID_CODE_ERRORS = ["invalidactivationcode", "invalidresetcode", "expiredresetcode"];
+const isInvalidCode = (message) =>
+    message === "invalidcode" ||
+    message instanceof jwt.JsonWebTokenError ||
+    INVALID_CODE_ERRORS.includes(message?.message);
+
+// Answers the error of a failed activator step: an invalid or expired link, a refused password,
+// an unknown user, or a server error (e.g. the mail couldn't be sent)
+const sendActivatorError = (res, activator) => {
+    if (activator.message === "badpassword" || activator.message === "missingpassword")
+        return res
+            .status(400)
+            .json({ errors: { password: { message: passwordUtils.PASSWORD_POLICY_MSG } } });
+    if (activator.code === 404)
+        return res.status(404).json({ message: labels.FAILED_AUTH_NO_USER_MSG });
+    if (isInvalidCode(activator.message))
+        return res.status(400).json({ message: labels.INVALID_LINK_MSG });
+
+    sendServerError(res, activator.message);
+};
+
 exports.afterCompleteActivation = (req, res) => {
+    // without this check, any code activated the account and logged in as its owner
+    if (!activatorSucceeded(req)) return sendActivatorError(res, req.activator || {});
+
     User.findById(req.params.user)
         .then((user) => {
             console.log("Activated user " + user.email);
@@ -194,10 +224,14 @@ exports.beforeCreatePasswordReset = (req, res, next) => {
 };
 
 exports.afterCreatePasswordReset = (req, res) => {
+    if (!activatorSucceeded(req)) return sendActivatorError(res, req.activator || {});
+
     res.status(200).json({});
 };
 
 exports.afterCompletePasswordReset = (req, res) => {
+    if (!activatorSucceeded(req)) return sendActivatorError(res, req.activator || {});
+
     console.log("Password reset for user " + req.params.user);
     res.status(200).json({});
 };

@@ -28,7 +28,7 @@ let createTestUsers = async function () {
             password: passwordUtils.cryptPasswordSync(user[2]),
             activated: user[3],
         });
-        newuser.save().then(
+        return newuser.save().then(
             (savedItem) => {
                 getSaveCallBack("User", "username", savedItem);
             },
@@ -38,7 +38,10 @@ let createTestUsers = async function () {
             }
         );
     });
-    await Promise.all(usersPromises);
+    // allSettled so that one failing user doesn't close the connection under the others
+    const results = await Promise.allSettled(usersPromises);
+    const failedNb = results.filter((result) => result.status === "rejected").length;
+    if (failedNb > 0) throw new Error(`${failedNb} test user(s) could not be created`);
 };
 
 async.series([createTestUsers], mainCallback);

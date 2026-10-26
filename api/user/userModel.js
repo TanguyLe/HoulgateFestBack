@@ -23,6 +23,8 @@ let UserSchema = new mongoose.Schema({
         required: true,
         default: false,
     },
+    // Set by hand in the DB or by another admin, never on sign up
+    isAdmin: { type: Boolean, default: false },
 });
 
 module.exports = mongoose.model("Users", UserSchema);

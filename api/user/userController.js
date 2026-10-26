@@ -155,6 +155,22 @@ exports.readUser = (req, res) => {
         });
 };
 
+// The connected user, with the rights the front needs to know about (the back still checks them)
+exports.readMe = (req, res) => {
+    User.findOne({ email: String(req.user.email) })
+        .then((user) => {
+            if (!user) return res.status(404).json({ message: labels.FAILED_AUTH_NO_USER_MSG });
+
+            res.json({
+                username: user.username,
+                email: user.email,
+                activated: user.activated,
+                isAdmin: user.isAdmin,
+            });
+        })
+        .catch((err) => sendServerError(res, err));
+};
+
 exports.beforeCreatePasswordReset = (req, res, next) => {
     User.findOne({ email: String(req.body.email) }).then(
         (user) => {

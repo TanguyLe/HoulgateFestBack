@@ -12,7 +12,7 @@ exports.deleteShotguns = (usersId, callback) => {
     usersId.forEach((item) => {
         // delete shotgun -> can't use deleteMany cause need a ref to a specific shotgun to clear the timeout
         let deleteShotgun = (callback) => {
-            Shotgun.findOneAndRemove({ user: item })
+            Shotgun.findOneAndDelete({ user: item })
                 .then((deletedShotgun) => {
                     if (!deletedShotgun) return callback();
 

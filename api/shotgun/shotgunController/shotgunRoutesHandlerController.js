@@ -257,7 +257,7 @@ exports.shotgunDelete = (req, res) => {
             },
             // Delete shotgun
             (callback) => {
-                Shotgun.findOneAndRemove({ room: req.params.roomId }).then(
+                Shotgun.findOneAndDelete({ room: req.params.roomId }).then(
                     (deletedShotgun) => {
                         if (!deletedShotgun)
                             return callback(

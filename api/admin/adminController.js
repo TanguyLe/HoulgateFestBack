@@ -2,7 +2,9 @@ let mongoose = require("mongoose"),
     User = mongoose.model("Users"),
     Edition = mongoose.model("Edition"),
     Shotgun = mongoose.model("Shotguns"),
+    Room = mongoose.model("Rooms"),
     historizeController = require("../shotgun/shotgunController/historizeController"),
+    timeout = require("../shotgun/shotgunController/timeoutController"),
     userActivator = require("../user/userActivator"),
     { sendServerError } = require("../utils/errors");
 
@@ -21,6 +23,12 @@ const sendData = (res, data, status = 200) =>
     res.status(status).send({ meta: { code: String(status) }, data: data });
 
 const sendInvalidId = (res) => res.status(400).send({ message: "Identifiant invalide." });
+
+// Ids sent in a body: isValidObjectId would also accept any 12 characters string
+const isObjectId = (value) => typeof value === "string" && /^[0-9a-fA-F]{24}$/.test(value);
+
+// An error answered as is to the admin, with its status
+const adminError = (status, message) => Object.assign(new Error(message), { status: status });
 
 const sendEditionError = (res, err) => {
     if (err.name === "ValidationError" || err.name === "CastError")
@@ -173,13 +181,24 @@ exports.deleteEdition = (req, res) => {
         .catch((err) => sendServerError(res, err));
 };
 
+const populateShotgun = (query) =>
+    query
+        .populate("room", "text nbBeds")
+        .populate("user", "username")
+        .populate("roommates", "username");
+
+// The users no longer own nor sleep in the room. Only the ones still linked to it are changed,
+// in case one of them was moved to another room in the meantime.
+const freeUsers = (userIds, roomId) =>
+    User.updateMany(
+        { _id: { $in: userIds }, room: roomId },
+        { $set: { hasShotgun: false, hasPreShotgun: false, room: null } }
+    );
+
 // The current shotguns, and how many shotguns each edition already has in the history
 exports.shotgunList = (req, res) => {
     Promise.all([
-        Shotgun.find({}, { __v: 0 })
-            .populate("room", "text")
-            .populate("user", "username")
-            .populate("roommates", "username"),
+        populateShotgun(Shotgun.find({}, { __v: 0 })),
         historizeController.getHistoryCounts(),
     ])
         .then(([shotguns, historyCounts]) =>
@@ -214,4 +233,135 @@ exports.historizeShotguns = (req, res) => {
             });
         })
         .catch((err) => sendServerError(res, err));
+};
+
+// Deletes a shotgun or a pre-shotgun and frees its room and all its users
+exports.deleteShotgun = (req, res) => {
+    if (!mongoose.isValidObjectId(req.params.shotgunId)) return sendInvalidId(res);
+
+    Shotgun.findByIdAndDelete(req.params.shotgunId)
+        .then((shotgun) => {
+            if (!shotgun) return res.status(404).send({ message: "Shotgun introuvable." });
+
+            timeout.clearShotgunTimeout(shotgun);
+            return freeUsers([shotgun.user, ...shotgun.roommates], shotgun.room).then((reset) => {
+                console.log(
+                    "Admin " +
+                        req.admin.email +
+                        " deleted the " +
+                        shotgun.status +
+                        " shotgun " +
+                        shotgun._id +
+                        " of room " +
+                        shotgun.room
+                );
+                sendData(res, { usersReset: reset.modifiedCount });
+            });
+        })
+        .catch((err) => sendServerError(res, err));
+};
+
+// Replaces the owner and the roommates of a shotgun, keeping its status. A pre-shotgun has no
+// roommates yet: only its owner can be changed. The new users must be activated and free: an admin
+// moving someone from another room deletes or edits that other shotgun first.
+exports.updateShotgun = async (req, res) => {
+    if (!mongoose.isValidObjectId(req.params.shotgunId)) return sendInvalidId(res);
+
+    const { user, roommates } = req.body;
+    if (!isObjectId(user) || !Array.isArray(roommates) || !roommates.every(isObjectId))
+        return res
+            .status(400)
+            .send({ message: "Un propriétaire et une liste de colocataires sont requis." });
+
+    const members = [user, ...roommates];
+    if (new Set(members).size !== members.length)
+        return res.status(400).send({ message: "Une même personne apparaît deux fois." });
+
+    try {
+        const shotgun = await Shotgun.findById(req.params.shotgunId);
+        if (!shotgun) throw adminError(404, "Shotgun introuvable.");
+
+        if (shotgun.status === "preShotgunned" && roommates.length)
+            throw adminError(
+                400,
+                "Un pré-shotgun n'a pas de colocataires : seul le propriétaire peut être changé."
+            );
+
+        const room = await Room.findById(shotgun.room);
+        if (!room) throw adminError(404, "Chambre introuvable.");
+        if (members.length > room.nbBeds)
+            throw adminError(
+                400,
+                "La chambre " + room.text + " n'a que " + room.nbBeds + " lit(s)."
+            );
+
+        const users = await User.find({ _id: { $in: members } }, { username: 1, activated: 1 });
+        if (users.length !== members.length) throw adminError(404, "Utilisateur introuvable.");
+
+        const notActivated = users.filter((u) => !u.activated);
+        if (notActivated.length)
+            throw adminError(
+                400,
+                "Compte(s) non activé(s) : " + notActivated.map((u) => u.username).join(", ") + "."
+            );
+
+        const others = await Shotgun.find({
+            _id: { $ne: shotgun._id },
+            $or: [{ user: { $in: members } }, { roommates: { $in: members } }],
+        });
+        const otherMembers = new Set(
+            others.flatMap((other) => [other.user, ...other.roommates]).map(String)
+        );
+        const busy = users.filter((u) => otherMembers.has(String(u._id)));
+        if (busy.length)
+            throw adminError(
+                409,
+                "Déjà dans une autre chambre : " +
+                    busy.map((u) => u.username).join(", ") +
+                    ". Modifie ou supprime d'abord ce shotgun."
+            );
+
+        const removed = [shotgun.user, ...shotgun.roommates].filter(
+            (member) => !members.includes(String(member))
+        );
+
+        shotgun.user = user;
+        shotgun.roommates = roommates;
+        await shotgun.save();
+
+        await freeUsers(removed, room._id);
+        await User.updateOne(
+            { _id: user },
+            {
+                $set: {
+                    hasShotgun: shotgun.status === "shotgunned",
+                    hasPreShotgun: true,
+                    room: room._id,
+                },
+            }
+        );
+        await User.updateMany(
+            { _id: { $in: roommates } },
+            { $set: { hasShotgun: true, hasPreShotgun: false, room: room._id } }
+        );
+
+        console.log(
+            "Admin " +
+                req.admin.email +
+                " updated the shotgun of room " +
+                room.text +
+                ": owner " +
+                user +
+                ", roommates " +
+                JSON.stringify(roommates)
+        );
+        sendData(res, await populateShotgun(Shotgun.findById(shotgun._id, { __v: 0 })));
+    } catch (err) {
+        if (err.status) return res.status(err.status).send({ message: err.message });
+        // The unique index on the owner: a concurrent shotgun got the new owner first
+        if (err.code === 11000)
+            return res.status(409).send({ message: "Ce propriétaire a déjà un shotgun." });
+
+        sendServerError(res, err);
+    }
 };

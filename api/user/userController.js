@@ -55,46 +55,74 @@ exports.login = (req, res) => {
     );
 };
 
+// Same messages as the `unique` options of the user model
+const DUPLICATE_MESSAGES = {
+    email: "Un compte avec cet email existe déjà.",
+    username: "Ce nom d'utilisateur n'est pas disponible.",
+};
+
+// Turns a failed user save into the `errors` shape the sign up form displays, without leaking
+// the raw DB error; anything else is a server error
+const sendSaveError = (res, err) => {
+    if (err.name === "ValidationError") {
+        let errors = {};
+        for (let field in err.errors) errors[field] = { message: err.errors[field].message };
+        return res.json({ errors: errors });
+    }
+
+    // duplicate key: the username (or a concurrently registered email) is taken
+    if (err.code === 11000) {
+        let field = Object.keys(err.keyValue || {})[0];
+        if (field in DUPLICATE_MESSAGES)
+            return res.json({ errors: { [field]: { message: DUPLICATE_MESSAGES[field] } } });
+    }
+
+    sendServerError(res, err);
+};
+
 exports.createUser = (req, res, next) => {
     if (!passwordUtils.isValidPassword(req.body.password))
         return res
             .status(400)
             .json({ errors: { password: { message: passwordUtils.PASSWORD_POLICY_MSG } } });
 
-    passwordUtils.cryptPassword(req.body.password).then((resPassword) => {
-        // Only pick the fields a user may set, so `activated`, `hasShotgun`, `room`... can't be forged
-        let newUserInfo = {
-            email: req.body.email,
-            username: req.body.username,
-            password: resPassword,
-        };
+    passwordUtils
+        .cryptPassword(req.body.password)
+        .then((resPassword) => {
+            // Only pick the fields a user may set, so `activated`, `hasShotgun`, `room`... can't be forged
+            let newUserInfo = {
+                email: req.body.email,
+                username: req.body.username,
+                password: resPassword,
+            };
 
-        let newUser = new User(newUserInfo);
+            let newUser = new User(newUserInfo);
 
-        User.findOne({ email: String(newUserInfo.email) }).then(
-            (user) => {
-                if (!user) {
-                    newUser.save().then(
-                        (user) => {
-                            console.log("Created user " + newUserInfo.email);
-                            req.activator = { id: user.id };
-                            next();
-                        },
-                        (err) => res.send(err)
-                    );
-                } else {
-                    res.json({
-                        errors: {
-                            email: {
-                                message: `Email ${newUserInfo.email} is already taken, take another.`,
+            User.findOne({ email: String(newUserInfo.email) }).then(
+                (user) => {
+                    if (!user) {
+                        newUser.save().then(
+                            (user) => {
+                                console.log("Created user " + newUserInfo.email);
+                                req.activator = { id: user.id };
+                                next();
                             },
-                        },
-                    });
-                }
-            },
-            (err) => sendServerError(res, err)
-        );
-    });
+                            (err) => sendSaveError(res, err)
+                        );
+                    } else {
+                        res.json({
+                            errors: {
+                                email: {
+                                    message: `Email ${newUserInfo.email} is already taken, take another.`,
+                                },
+                            },
+                        });
+                    }
+                },
+                (err) => sendServerError(res, err)
+            );
+        })
+        .catch((err) => sendServerError(res, err));
 };
 
 exports.createActivateHandler = function (req, res, next) {

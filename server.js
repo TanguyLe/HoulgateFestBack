@@ -9,6 +9,7 @@ let express = require("express"),
     Edition = require("./api/edition/editionModel"),
     middleware = require("./api/utils/middleware"),
     rateLimits = require("./api/utils/rateLimits"),
+    captcha = require("./api/utils/captcha"),
     scriptsUtils = require("./scripts/scriptsUtils"),
     statusRoutes = require("./api/status/statusRoutes"),
     userRoutes = require("./api/user/userRoutes"),
@@ -62,7 +63,7 @@ app.use((req, res, next) => {
 // Behind Vercel's proxy: trust its X-Forwarded-For so rate limits apply to the client IP
 app.set("trust proxy", 1);
 app.post("/login", rateLimits.login);
-app.post("/users", rateLimits.signUp);
+app.post("/users", rateLimits.signUp, captcha.verify);
 app.post("/passwordReset", rateLimits.passwordReset);
 app.post("/contact", rateLimits.contact);
 

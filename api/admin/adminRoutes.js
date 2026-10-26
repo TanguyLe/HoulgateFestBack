@@ -7,6 +7,7 @@ module.exports = (app) => {
 
     app.route("/admin/users").get(admin.userList);
     app.route("/admin/users/:userId").put(admin.updateUser);
+    app.route("/admin/users/:userId/activationEmail").post(admin.sendActivationEmail);
 
     app.route("/admin/shotguns").get(admin.shotgunList);
     app.route("/admin/shotguns/historize").post(admin.historizeShotguns);

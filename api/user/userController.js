@@ -56,8 +56,10 @@ exports.login = (req, res) => {
 };
 
 exports.createUser = (req, res, next) => {
-    if (!isPassword(req.body.password))
-        return res.status(400).json({ errors: { password: { message: "Password required" } } });
+    if (!passwordUtils.isValidPassword(req.body.password))
+        return res
+            .status(400)
+            .json({ errors: { password: { message: passwordUtils.PASSWORD_POLICY_MSG } } });
 
     passwordUtils.cryptPassword(req.body.password).then((resPassword) => {
         // Only pick the fields a user may set, so `activated`, `hasShotgun`, `room`... can't be forged

@@ -52,6 +52,8 @@ exports.config = {
                     callback(err, null);
                 });
         },
+        // Same policy as on sign up, checked before the password reset is applied
+        validatePassword: (password) => passwordUtils.isValidPassword(password),
     },
     emailProperty: "email",
     signkey: tokenUtils.secret,

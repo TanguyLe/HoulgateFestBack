@@ -145,7 +145,7 @@ exports.shotgunCreatePost = (req, res) => {
         (err, shotgun) => {
             if (err) {
                 if (!err.httpStatusCode) return errors.sendServerError(res, err);
-                return res.status(err.httpStatusCode).send({
+                return res.status(Number(err.httpStatusCode)).send({
                     meta: {
                         error_type: err.name,
                         code: err.httpStatusCode,
@@ -322,7 +322,7 @@ exports.shotgunDelete = (req, res) => {
             if (err) {
                 console.error("-> Error while deleting from DB.");
                 if (!err.httpStatusCode) return errors.sendServerError(res, err);
-                return res.status(err.httpStatusCode).send({
+                return res.status(Number(err.httpStatusCode)).send({
                     meta: {
                         error_type: err.name,
                         code: err.httpStatusCode,
@@ -474,7 +474,7 @@ exports.roommatesAdd = (req, res, next) => {
                     });
                 } else if (!err.httpStatusCode) return errors.sendServerError(res, err);
                 else
-                    return res.status(err.httpStatusCode).send({
+                    return res.status(Number(err.httpStatusCode)).send({
                         meta: {
                             error_type: err.name,
                             code: err.httpStatusCode,

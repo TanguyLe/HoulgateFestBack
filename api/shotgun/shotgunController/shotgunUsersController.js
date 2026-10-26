@@ -13,11 +13,19 @@ let getAlreadyShotgunError = (username) => {
     return error;
 };
 
-// Marks the user as shotgun in the room only if they haven't already shotgun, in a single update,
-// so two concurrent shotguns can't both claim the same user
+let getNotActivatedError = (username) => {
+    console.error("-> User " + username + " is not activated");
+    let error = new Error("User " + username + " is not activated.");
+    error.name = "Error 403 : Forbidden";
+    error.httpStatusCode = "403";
+    return error;
+};
+
+// Marks the user as shotgun in the room only if they are activated and haven't already shotgun,
+// in a single update, so two concurrent shotguns can't both claim the same user
 let claimUser = (userId, roomId) =>
     User.findOneAndUpdate(
-        { _id: userId, hasShotgun: false },
+        { _id: userId, activated: true, hasShotgun: false },
         { hasShotgun: true, room: roomId },
         { new: true }
     );
@@ -55,7 +63,12 @@ exports.shotgunUsers = (shotgun, userOwner, updateRoommates, roomId, callback) =
 
                 claimUser(user._id, roomId)
                     .then((claimedUser) => {
-                        if (!claimedUser) return callback(getAlreadyShotgunError(user.username));
+                        if (!claimedUser)
+                            return callback(
+                                user.activated
+                                    ? getAlreadyShotgunError(user.username)
+                                    : getNotActivatedError(user.username)
+                            );
 
                         console.log("User " + user.username + " has shotgun.");
                         claimedUsers.push(claimedUser._id);
@@ -86,9 +99,10 @@ exports.shotgunUsers = (shotgun, userOwner, updateRoommates, roomId, callback) =
                         return callback(null, user._id);
                     }
 
-                    // not claimed: either unknown or already shotgun
+                    // not claimed: either unknown, not activated or already shotgun
                     return User.findById(item).then((user) => {
                         if (!user) return callback(userError.getUserNotFoundError("id", item));
+                        if (!user.activated) return callback(getNotActivatedError(user.username));
                         callback(getAlreadyShotgunError(user.username));
                     });
                 })

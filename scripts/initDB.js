@@ -16,7 +16,7 @@ let scriptsUtils = require("./scriptsUtils"),
 
 console.log(
     "This script populates initial necessary objects to the database (rooms & editions)." +
-        " It will fail if the DB is not accessible and log if a record is already present. \n"
+        " It will fail if the DB is not accessible and log if a record is already present. \n",
 );
 
 let createRooms = (callback) => {
@@ -38,9 +38,9 @@ let createRooms = (callback) => {
                     (err) => {
                         console.error(`Error creating room ${room.name} because of: ${err}`);
                         throw new Error(err);
-                    }
+                    },
                 );
-            })
+            }),
         );
     });
 
@@ -63,14 +63,14 @@ let createEditions = (callback) => {
                     },
                     (err) => {
                         console.error(
-                            `Error creating edition ${editionDef.year}.${editionDef.weekendDate} because of: ${err}`
+                            `Error creating edition ${editionDef.year}.${editionDef.weekendDate} because of: ${err}`,
                         );
                         throw new Error(err);
-                    }
+                    },
                 );
-            })
+            }),
         ),
-        callback
+        callback,
     );
 };
 

@@ -36,13 +36,8 @@ module.exports = {
         return connectionURI;
     },
     connectToDb: (mongoDBUri) => {
-        mongoose.Promise = global.Promise;
-        //mongoose.set("useCreateIndex", true);
         mongoose.connection.on("error", console.error.bind(console, "MongoDB connection error:"));
-        mongoose.connect(mongoDBUri, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        });
+        mongoose.connect(mongoDBUri);
 
         return mongoose.connection;
     },
@@ -58,12 +53,12 @@ module.exports = {
         getSingleOperationCallback(label, objectSerialize, getDeleteMessage, object),
     getDeleteManyCallback: (label, result) => {
         console.log(
-            `${label} have been deleted if present, ${result.deletedCount} actual deletions.`
+            `${label} have been deleted if present, ${result.deletedCount} actual deletions.`,
         );
     },
     getUpdateManyCallback: (label, result) => {
         console.log(
-            `${label} have been updated if present, ${result.modifiedCount} actual updates.`
+            `${label} have been updated if present, ${result.modifiedCount} actual updates.`,
         );
     },
     getMainCallback: (mongooseConnection) => (err, result) => {

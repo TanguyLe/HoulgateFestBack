@@ -17,7 +17,7 @@ let scriptsUtils = require("./scriptsUtils"),
 console.log(
     "This script cleans the database from the test records. " +
         "(test users and test user's shotguns)." +
-        " It will fail if the DB is not accessible. \n"
+        " It will fail if the DB is not accessible. \n",
 );
 
 const isTestShotgun = (shotgun) => testUsernames.includes(shotgun.user.username);
@@ -39,7 +39,7 @@ const deleteTestUsersShotguns = async () => {
                     hasPreShotgun: false,
                     room: null,
                 },
-            }
+            },
         );
         getUpdateManyCallback("\nTest users " + testUsernames.join(", "), result);
     } catch (error) {
@@ -68,5 +68,5 @@ const seriesFull = [
 
 async.series(
     process.argv.slice(2).includes("shotgunOnly") ? [deleteTestUsersShotguns] : seriesFull,
-    mainCallback
+    mainCallback,
 );

@@ -18,7 +18,7 @@ exports.deleteShotguns = (usersId, callback) => {
 
                     // The user owned a room before
                     console.log(
-                        "Shotgun associated to user with id " + item + " has been deleted."
+                        "Shotgun associated to user with id " + item + " has been deleted.",
                     );
 
                     timeout.clearShotgunTimeout(deletedShotgun); // remove the timeout that checks if the shotgun has been finalised

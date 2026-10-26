@@ -24,7 +24,7 @@ exports.historizeShotguns = async (edition) => {
                     },
                     upsert: true,
                 },
-            }))
+            })),
         );
 
     const deleted = await Shotgun.deleteMany({
@@ -35,7 +35,7 @@ exports.historizeShotguns = async (edition) => {
     });
     const reset = await User.updateMany(
         { $or: [{ hasShotgun: true }, { hasPreShotgun: true }, { room: { $ne: null } }] },
-        { $set: { hasShotgun: false, hasPreShotgun: false, room: null } }
+        { $set: { hasShotgun: false, hasPreShotgun: false, room: null } },
     );
 
     return {

@@ -20,7 +20,7 @@ exports.checkRoomNotShotgun = (roomId, callback) => {
         },
         (err) => {
             return callback(err);
-        }
+        },
     );
 };
 
@@ -37,6 +37,6 @@ exports.findShotgun = (roomId, callback) => {
         },
         (err) => {
             return callback(err);
-        }
+        },
     );
 };

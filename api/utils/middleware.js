@@ -16,7 +16,7 @@ exports.userAuth = (req, res, next) => {
                 (err, decode) => {
                     if (!err) req.user = decode;
                 },
-                false
+                false,
             );
     }
 
@@ -48,7 +48,7 @@ exports.hasStarted = (req, res, next) => {
                 else res.status(400).send({ message: "Shotgun has not started yet" });
             },
             // without this the request never got an answer when the editions couldn't be read
-            (err) => sendServerError(res, err)
+            (err) => sendServerError(res, err),
         );
     }
 };

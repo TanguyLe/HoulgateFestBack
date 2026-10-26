@@ -59,7 +59,7 @@ let retrieveStandaloneUsers = (shotguns, cb) => {
             hasPreShotgun: 0,
             room: 0,
             activated: 0,
-        }
+        },
     )
         .exec()
         .then((users) => {

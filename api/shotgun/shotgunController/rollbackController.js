@@ -29,7 +29,7 @@ let handleUserRollback = (item, roomId, callback) => {
                     });
             } else {
                 console.log(
-                    "User " + user.username + " has already shotgun another room. Not rolled back."
+                    "User " + user.username + " has already shotgun another room. Not rolled back.",
                 );
                 return callback(null, user._id);
             }
@@ -93,7 +93,7 @@ let rollBackShotgun = (roomId, callback) => {
                         roommates: [],
                         status: "preShotgunned",
                     },
-                    { new: true }
+                    { returnDocument: "after" },
                 )
                     .then((shotgun) => {
                         return callback(null, shotgun);
@@ -111,7 +111,7 @@ let rollBackShotgun = (roomId, callback) => {
             }
             console.log("... Shotgun successfully rolled back.");
             callback(null, shotgun);
-        }
+        },
     );
 };
 

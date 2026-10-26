@@ -25,7 +25,7 @@ exports.mailSender = (mailContent, cb, triedOnce) => {
                     setTimeout(this.timeoutTriggered.bind(null, mailContent, cb), 1000);
                 } else {
                     let error = new Error(
-                        "Email sending to " + mailContent.to + " failed after retry."
+                        "Email sending to " + mailContent.to + " failed after retry.",
                     );
                     error.name = "Error 500 : Internal Server Error";
                     error.httpStatusCode = "500";
@@ -50,13 +50,13 @@ exports.timeoutTriggered = (mailContent, callback) => {
                         mailContent.to +
                         " with subject " +
                         mailContent.subject +
-                        " failed."
+                        " failed.",
                 );
                 return callback(err);
             }
             console.log("Email successfully sent to " + mailContent.to + ".");
             return callback(false);
         },
-        true
+        true,
     ); // set to true in order to indicate a second trial
 };

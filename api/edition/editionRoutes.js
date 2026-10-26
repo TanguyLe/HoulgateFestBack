@@ -16,7 +16,7 @@ const getEditions = (req, res) => {
                         : editions,
             });
         },
-        (err) => sendServerError(res, err)
+        (err) => sendServerError(res, err),
     );
 };
 

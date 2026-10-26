@@ -3,6 +3,7 @@ let mongoose = require("mongoose"),
     Edition = mongoose.model("Edition"),
     Shotgun = mongoose.model("Shotguns"),
     historizeController = require("../shotgun/shotgunController/historizeController"),
+    userActivator = require("../user/userActivator"),
     { sendServerError } = require("../utils/errors");
 
 // Only these fields can be changed from the admin interface: emails and usernames stay the users'
@@ -93,6 +94,36 @@ exports.updateUser = (req, res) => {
                     JSON.stringify(update)
             );
             return findUsers({ _id: req.params.userId }).then((users) => sendData(res, users[0]));
+        })
+        .catch((err) => sendServerError(res, err));
+};
+
+// Sends a new activation link to a user who lost theirs (the previous links stay valid)
+exports.sendActivationEmail = (req, res) => {
+    if (!mongoose.isValidObjectId(req.params.userId)) return sendInvalidId(res);
+
+    User.findById(req.params.userId)
+        .then((user) => {
+            if (!user) return res.status(404).send({ message: "Utilisateur introuvable." });
+            if (user.activated)
+                return res.status(400).send({ message: "Ce compte est déjà activé." });
+
+            // Without it activator would read the id from req.user, which only holds the token
+            req.activator = { id: user.id };
+            // The "Next" handlers of activator always call next(): the outcome is in req.activator
+            userActivator.activator.createActivateNext(req, res, () => {
+                if (req.activator.code !== 201) {
+                    console.error("Activation email to " + user.email + " failed:", req.activator);
+                    return res
+                        .status(502)
+                        .send({ message: "L'email d'activation n'a pas pu être envoyé." });
+                }
+
+                console.log(
+                    "Admin " + req.admin.email + " resent the activation email to " + user.email
+                );
+                sendData(res, { email: user.email });
+            });
         })
         .catch((err) => sendServerError(res, err));
 };

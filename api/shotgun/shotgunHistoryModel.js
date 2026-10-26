@@ -30,7 +30,7 @@ let shotgunHistorySchema = new mongoose.Schema(
     {
         timestamps: true,
         collection: "shotgunsHistory",
-    }
+    },
 );
 
 module.exports = mongoose.model("ShotgunsHistory", shotgunHistorySchema);

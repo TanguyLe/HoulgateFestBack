@@ -99,7 +99,7 @@ exports.updateUser = (req, res) => {
                     " updated user " +
                     req.params.userId +
                     ": " +
-                    JSON.stringify(update)
+                    JSON.stringify(update),
             );
             return findUsers({ _id: req.params.userId }).then((users) => sendData(res, users[0]));
         })
@@ -128,7 +128,7 @@ exports.sendActivationEmail = (req, res) => {
                 }
 
                 console.log(
-                    "Admin " + req.admin.email + " resent the activation email to " + user.email
+                    "Admin " + req.admin.email + " resent the activation email to " + user.email,
                 );
                 sendData(res, { email: user.email });
             });
@@ -192,7 +192,7 @@ const populateShotgun = (query) =>
 const freeUsers = (userIds, roomId) =>
     User.updateMany(
         { _id: { $in: userIds }, room: roomId },
-        { $set: { hasShotgun: false, hasPreShotgun: false, room: null } }
+        { $set: { hasShotgun: false, hasPreShotgun: false, room: null } },
     );
 
 // The current shotguns, and how many shotguns each edition already has in the history
@@ -208,7 +208,7 @@ exports.shotgunList = (req, res) => {
                     counts[count._id] = count.count;
                     return counts;
                 }, {}),
-            })
+            }),
         )
         .catch((err) => sendServerError(res, err));
 };
@@ -227,7 +227,7 @@ exports.historizeShotguns = (req, res) => {
                         " historized the shotguns of " +
                         edition.year +
                         ": " +
-                        JSON.stringify(result)
+                        JSON.stringify(result),
                 );
                 sendData(res, result);
             });
@@ -253,7 +253,7 @@ exports.deleteShotgun = (req, res) => {
                         " shotgun " +
                         shotgun._id +
                         " of room " +
-                        shotgun.room
+                        shotgun.room,
                 );
                 sendData(res, { usersReset: reset.modifiedCount });
             });
@@ -284,7 +284,7 @@ exports.updateShotgun = async (req, res) => {
         if (shotgun.status === "preShotgunned" && roommates.length)
             throw adminError(
                 400,
-                "Un pré-shotgun n'a pas de colocataires : seul le propriétaire peut être changé."
+                "Un pré-shotgun n'a pas de colocataires : seul le propriétaire peut être changé.",
             );
 
         const room = await Room.findById(shotgun.room);
@@ -292,7 +292,7 @@ exports.updateShotgun = async (req, res) => {
         if (members.length > room.nbBeds)
             throw adminError(
                 400,
-                "La chambre " + room.text + " n'a que " + room.nbBeds + " lit(s)."
+                "La chambre " + room.text + " n'a que " + room.nbBeds + " lit(s).",
             );
 
         const users = await User.find({ _id: { $in: members } }, { username: 1, activated: 1 });
@@ -302,7 +302,7 @@ exports.updateShotgun = async (req, res) => {
         if (notActivated.length)
             throw adminError(
                 400,
-                "Compte(s) non activé(s) : " + notActivated.map((u) => u.username).join(", ") + "."
+                "Compte(s) non activé(s) : " + notActivated.map((u) => u.username).join(", ") + ".",
             );
 
         const others = await Shotgun.find({
@@ -310,7 +310,7 @@ exports.updateShotgun = async (req, res) => {
             $or: [{ user: { $in: members } }, { roommates: { $in: members } }],
         });
         const otherMembers = new Set(
-            others.flatMap((other) => [other.user, ...other.roommates]).map(String)
+            others.flatMap((other) => [other.user, ...other.roommates]).map(String),
         );
         const busy = users.filter((u) => otherMembers.has(String(u._id)));
         if (busy.length)
@@ -318,11 +318,11 @@ exports.updateShotgun = async (req, res) => {
                 409,
                 "Déjà dans une autre chambre : " +
                     busy.map((u) => u.username).join(", ") +
-                    ". Modifie ou supprime d'abord ce shotgun."
+                    ". Modifie ou supprime d'abord ce shotgun.",
             );
 
         const removed = [shotgun.user, ...shotgun.roommates].filter(
-            (member) => !members.includes(String(member))
+            (member) => !members.includes(String(member)),
         );
 
         shotgun.user = user;
@@ -338,11 +338,11 @@ exports.updateShotgun = async (req, res) => {
                     hasPreShotgun: true,
                     room: room._id,
                 },
-            }
+            },
         );
         await User.updateMany(
             { _id: { $in: roommates } },
-            { $set: { hasShotgun: true, hasPreShotgun: false, room: room._id } }
+            { $set: { hasShotgun: true, hasPreShotgun: false, room: room._id } },
         );
 
         console.log(
@@ -353,7 +353,7 @@ exports.updateShotgun = async (req, res) => {
                 ": owner " +
                 user +
                 ", roommates " +
-                JSON.stringify(roommates)
+                JSON.stringify(roommates),
         );
         sendData(res, await populateShotgun(Shotgun.findById(shotgun._id, { __v: 0 })));
     } catch (err) {

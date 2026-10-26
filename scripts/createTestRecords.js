@@ -13,7 +13,7 @@ let passwordUtils = require("../api/utils/password"),
 
 console.log(
     "This script populates the database with a few test records. (users)." +
-        " It will fail if the DB is not accessible and log if a record is already present. \n"
+        " It will fail if the DB is not accessible and log if a record is already present. \n",
 );
 
 let createTestUsers = async function () {
@@ -35,7 +35,7 @@ let createTestUsers = async function () {
             (err) => {
                 console.error(`Error creating test user ${user[0]} because of: ${err}`);
                 throw new Error(err);
-            }
+            },
         );
     });
     // allSettled so that one failing user doesn't close the connection under the others

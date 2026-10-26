@@ -1,7 +1,6 @@
 let express = require("express"),
     cors = require("cors"),
     helmet = require("helmet"),
-    bodyParser = require("body-parser"),
     app = express(),
     port = process.env.PORT || 3000,
     User = require("./api/user/userModel"),
@@ -30,7 +29,7 @@ app.use(
             useDefaults: false,
             directives: { defaultSrc: ["'none'"], frameAncestors: ["'none'"] },
         },
-    })
+    }),
 );
 // These responses carry access and refresh tokens, so browsers and proxies must not store them
 app.use(["/login", "/refreshLogin", "/users/:user/activate"], (req, res, next) => {
@@ -50,10 +49,15 @@ app.use(
             ...(process.env.FRONT_HOST ? [process.env.FRONT_HOST.replace(/\/$/, "")] : []),
             frontPreviewOrigin,
         ],
-    })
+    }),
 );
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+// Express 5 leaves req.body undefined when nothing was parsed: handlers read its fields directly
+app.use((req, res, next) => {
+    req.body ??= {};
+    next();
+});
 
 // Behind Vercel's proxy: trust its X-Forwarded-For so rate limits apply to the client IP
 app.set("trust proxy", 1);

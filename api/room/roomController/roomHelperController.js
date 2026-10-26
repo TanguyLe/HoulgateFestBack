@@ -28,7 +28,7 @@ exports.checkRoomReadyForShotgun = (roomId, usersNb, callback) => {
             if (room.nbBeds < usersNb) {
                 console.error("-> Not enough space in selected room");
                 let error = new Error(
-                    "Too many roommates for room with id " + roomId + " : not enough beds"
+                    "Too many roommates for room with id " + roomId + " : not enough beds",
                 );
                 error.name = "Error 403 : Forbidden";
                 error.httpStatusCode = "403";

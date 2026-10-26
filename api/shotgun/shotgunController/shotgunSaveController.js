@@ -49,12 +49,12 @@ exports.savePreShotgun = (userId, room, callback) => {
                                 hasPreShotgun: true,
                                 room: roomId,
                             },
-                            { new: true }
+                            { returnDocument: "after" },
                         )
                             .then((foundUser) => {
                                 if (!foundUser)
                                     return callback(
-                                        userErrors.getUserNotFoundError("id", shotgun.user)
+                                        userErrors.getUserNotFoundError("id", shotgun.user),
                                     );
 
                                 console.log("...User " + foundUser.username + " is updated.");
@@ -71,12 +71,12 @@ exports.savePreShotgun = (userId, room, callback) => {
                             hasPreShotgun: true,
                             room: roomId,
                         },
-                        { new: true }
+                        { returnDocument: "after" },
                     )
                         .then((foundUser) => {
                             if (!foundUser)
                                 return callback(
-                                    userErrors.getUserNotFoundError("id", shotgun.user)
+                                    userErrors.getUserNotFoundError("id", shotgun.user),
                                 );
 
                             console.log("...User " + foundUser.username + " is updated.");
@@ -107,6 +107,6 @@ exports.savePreShotgun = (userId, room, callback) => {
         (err, shotgun) => {
             if (err) return callback(err);
             callback(null, shotgun);
-        }
+        },
     );
 };

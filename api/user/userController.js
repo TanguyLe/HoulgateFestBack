@@ -52,7 +52,7 @@ exports.login = (req, res) => {
         },
         (err) => {
             sendServerError(res, err);
-        }
+        },
     );
 };
 
@@ -108,7 +108,7 @@ exports.createUser = (req, res, next) => {
                                 req.activator = { id: user.id };
                                 next();
                             },
-                            (err) => sendSaveError(res, err)
+                            (err) => sendSaveError(res, err),
                         );
                     } else {
                         res.json({
@@ -120,7 +120,7 @@ exports.createUser = (req, res, next) => {
                         });
                     }
                 },
-                (err) => sendServerError(res, err)
+                (err) => sendServerError(res, err),
             );
         })
         .catch((err) => sendServerError(res, err));
@@ -219,7 +219,7 @@ exports.beforeCreatePasswordReset = (req, res, next) => {
         },
         (err) => {
             sendServerError(res, err);
-        }
+        },
     );
 };
 
@@ -245,7 +245,7 @@ exports.refreshLogin = (req, res) => {
         (err, decode) => {
             user = decode;
         },
-        true
+        true,
     );
 
     if (

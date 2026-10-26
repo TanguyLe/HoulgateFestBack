@@ -1,5 +1,4 @@
-let mongo = require("mongodb"),
-    mongoose = require("mongoose"),
+let mongoose = require("mongoose"),
     nodemailer = require("nodemailer"),
     activator = require("activator"),
     User = mongoose.model("Users"),
@@ -27,7 +26,7 @@ exports.config = {
                 });
         },
         activate: (id, callback) => {
-            User.updateOne({ _id: new mongo.ObjectId(id) }, { $set: { activated: true } })
+            User.updateOne({ _id: new mongoose.Types.ObjectId(id) }, { $set: { activated: true } })
                 .then((obj) => {
                     callback(null, obj);
                 })
@@ -41,9 +40,9 @@ exports.config = {
                 .cryptPassword(password)
                 .then((resPassword) =>
                     User.updateOne(
-                        { _id: new mongo.ObjectId(id) },
-                        { $set: { password: resPassword } }
-                    )
+                        { _id: new mongoose.Types.ObjectId(id) },
+                        { $set: { password: resPassword } },
+                    ),
                 )
                 .then((obj) => {
                     callback(null, obj);

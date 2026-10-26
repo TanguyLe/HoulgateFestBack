@@ -39,7 +39,7 @@ exports.shotgunCreatePost = (req, res) => {
         (err, decode) => {
             user = decode;
         },
-        false
+        false,
     );
 
     if (!user) {
@@ -99,7 +99,7 @@ exports.shotgunCreatePost = (req, res) => {
                                             (err, room) => {
                                                 if (err) return callback(err);
                                                 callback(null, room);
-                                            }
+                                            },
                                         );
                                     },
                                     (callback) => {
@@ -108,16 +108,16 @@ exports.shotgunCreatePost = (req, res) => {
                                             (err) => {
                                                 if (err) {
                                                     console.error(
-                                                        "-> Error check room not shotgun."
+                                                        "-> Error check room not shotgun.",
                                                     );
                                                     return callback(err);
                                                 }
                                                 callback();
-                                            }
+                                            },
                                         );
                                     },
                                 ],
-                                callback
+                                callback,
                             );
                         },
                     ],
@@ -128,7 +128,7 @@ exports.shotgunCreatePost = (req, res) => {
                         }
                         console.log("... Room OK.");
                         callback(null, results); // results contains the owner userId and the room
-                    }
+                    },
                 );
             },
             (results, callback) => {
@@ -165,7 +165,7 @@ exports.shotgunCreatePost = (req, res) => {
                 },
                 data: shotgun,
             });
-        }
+        },
     );
 };
 
@@ -181,7 +181,7 @@ exports.shotgunDelete = (req, res) => {
         (err, decode) => {
             user = decode;
         },
-        false
+        false,
     );
 
     if (!user) {
@@ -213,7 +213,7 @@ exports.shotgunDelete = (req, res) => {
                     (shotgun) => {
                         if (!shotgun)
                             return callback(
-                                shotgunErrors.getShotgunNotFoundError(req.params.roomId)
+                                shotgunErrors.getShotgunNotFoundError(req.params.roomId),
                             );
 
                         console.log("... Shotgun found.");
@@ -221,7 +221,7 @@ exports.shotgunDelete = (req, res) => {
                     },
                     (err) => {
                         return callback(err);
-                    }
+                    },
                 );
             },
             // check user owner
@@ -237,12 +237,12 @@ exports.shotgunDelete = (req, res) => {
                             console.error(
                                 "-> User " +
                                     user.username +
-                                    " doesn't own the shotgun. Can't delete the shotgun."
+                                    " doesn't own the shotgun. Can't delete the shotgun.",
                             );
                             let error = new Error(
                                 "User " +
                                     user.username +
-                                    " doesn't own the shotgun. Delete forbidden"
+                                    " doesn't own the shotgun. Delete forbidden",
                             );
                             error.name = "Error 403 : Forbidden";
                             error.httpStatusCode = "403";
@@ -252,16 +252,16 @@ exports.shotgunDelete = (req, res) => {
                     },
                     (err) => {
                         return callback(err);
-                    }
+                    },
                 );
             },
             // Delete shotgun
             (callback) => {
-                Shotgun.findOneAndRemove({ room: req.params.roomId }).then(
+                Shotgun.findOneAndDelete({ room: req.params.roomId }).then(
                     (deletedShotgun) => {
                         if (!deletedShotgun)
                             return callback(
-                                shotgunErrors.getShotgunNotFoundError(req.params.roomId)
+                                shotgunErrors.getShotgunNotFoundError(req.params.roomId),
                             );
                         console.log("... Shotgun successfully deleted.");
                         timeout.clearShotgunTimeout(deletedShotgun); // remove timeout set when the shotgun was created
@@ -273,10 +273,10 @@ exports.shotgunDelete = (req, res) => {
                             errors.getServerError(
                                 "Shotgun with roomId " +
                                     req.params.roomId +
-                                    " could not be deleted."
-                            )
+                                    " could not be deleted.",
+                            ),
                         );
-                    }
+                    },
                 );
             },
             (shotgun, callback) => {
@@ -314,7 +314,7 @@ exports.shotgunDelete = (req, res) => {
                         rollBack: rollBackRoommates.bind(null, shotgun),
                         update: updateUserOwner.bind(null, shotgun),
                     },
-                    callback
+                    callback,
                 );
             },
         ],
@@ -337,7 +337,7 @@ exports.shotgunDelete = (req, res) => {
                     desc: "Shotgun deleted successfully!",
                 },
             });
-        }
+        },
     );
 };
 
@@ -355,7 +355,7 @@ exports.roomList = (req, res) => {
                     data: foundShotguns,
                 });
             },
-            (err) => errors.sendServerError(res, err)
+            (err) => errors.sendServerError(res, err),
         );
 };
 
@@ -371,7 +371,7 @@ exports.roommatesAdd = (req, res, next) => {
         (err, decode) => {
             user = decode;
         },
-        false
+        false,
     );
 
     if (!user) {
@@ -420,7 +420,7 @@ exports.roommatesAdd = (req, res, next) => {
                 roomHelper.checkRoomReadyForShotgun(
                     req.params.roomId,
                     updateUsers.length + 1,
-                    callback
+                    callback,
                 );
             },
             (room, callback) => {
@@ -455,10 +455,10 @@ exports.roommatesAdd = (req, res, next) => {
                         (err) => {
                             return callback(
                                 errors.getServerError(
-                                    "Couldn't populate shotgun " + shotgun._id + "."
-                                )
+                                    "Couldn't populate shotgun " + shotgun._id + ".",
+                                ),
                             );
-                        }
+                        },
                     );
             },
         ],
@@ -492,6 +492,6 @@ exports.roommatesAdd = (req, res, next) => {
                 },
                 data: shotgun,
             });
-        }
+        },
     );
 };

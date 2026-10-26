@@ -19,7 +19,7 @@ exports.completeShotgun = (roomId, roommatesId, callback) => {
             roommates: roommatesId,
             status: "shotgunned",
         },
-        { new: true }
+        { returnDocument: "after" },
     )
         .then((shotgun) => {
             if (!shotgun) return callback(shotgunErrors.getShotgunNotFoundError(roomId));
@@ -66,7 +66,7 @@ exports.afterCompleteShotgun = (shotgun) => {
             .catch((err) => {
                 console.error("-> Couldn't populate shotgun " + shotgun._id + ".");
                 return callback(
-                    errors.getServerError("Couldn't populate shotgun " + shotgun._id + ".")
+                    errors.getServerError("Couldn't populate shotgun " + shotgun._id + "."),
                 );
             });
     };
@@ -82,7 +82,9 @@ exports.afterCompleteShotgun = (shotgun) => {
         let content = shotgunNotification.getShotgunNotificationContent(
             userOwner.username,
             room.text,
-            users.map((item) => item.username).filter((username) => username !== userOwner.username)
+            users
+                .map((item) => item.username)
+                .filter((username) => username !== userOwner.username),
         );
 
         // send mail to all users
@@ -101,8 +103,8 @@ exports.afterCompleteShotgun = (shotgun) => {
                             errors.getServerError(
                                 "Couldn't send email to users after shotgun " +
                                     populatedShotgun._id +
-                                    " completed."
-                            )
+                                    " completed.",
+                            ),
                         );
                     }
                     console.log("Recap mail sent to " + item.username);
@@ -118,7 +120,7 @@ exports.afterCompleteShotgun = (shotgun) => {
     async.waterfall([retrieveShotgun.bind(null, shotgun), sendMails], (err, result) => {
         if (err)
             return console.error(
-                "-> After complete shotgun failed for shotgun with id:" + shotgun._id + "."
+                "-> After complete shotgun failed for shotgun with id:" + shotgun._id + ".",
             );
         return console.log("...Recap sent to all users.");
     });

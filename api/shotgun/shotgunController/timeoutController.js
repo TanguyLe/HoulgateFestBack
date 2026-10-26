@@ -12,7 +12,7 @@ let tuttimer = {};
 exports.setShotgunTimeout = (shotgun) => {
     tuttimer[shotgun._id] = setTimeout(
         this.shotgunTimeoutTriggered.bind(null, shotgun),
-        SHOTGUN_TIMEOUT_MS
+        SHOTGUN_TIMEOUT_MS,
     );
 };
 

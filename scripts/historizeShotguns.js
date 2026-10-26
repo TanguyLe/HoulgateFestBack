@@ -15,7 +15,7 @@ const year = Number(process.argv[2] || new Date().getFullYear());
 console.log(
     "This script moves all the shotguns to the history of an edition and frees the rooms and users: " +
         "npm run historizeShotguns -- [year] (default: the current year)." +
-        " The admin interface does the same.\n"
+        " The admin interface does the same.\n",
 );
 
 const run = async () => {
@@ -25,7 +25,7 @@ const run = async () => {
     const result = await historizeShotguns(edition);
     console.log(
         `${result.historized} shotguns historized for ${year}, ` +
-            `${result.droppedPreShotguns} pre-shotguns dropped, ${result.usersReset} users reset.`
+            `${result.droppedPreShotguns} pre-shotguns dropped, ${result.usersReset} users reset.`,
     );
 };
 

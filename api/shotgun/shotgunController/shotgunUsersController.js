@@ -27,7 +27,7 @@ let claimUser = (userId, roomId) =>
     User.findOneAndUpdate(
         { _id: userId, activated: true, hasShotgun: false },
         { hasShotgun: true, room: roomId },
-        { new: true }
+        { returnDocument: "after" },
     );
 
 // Shotgun all users
@@ -51,10 +51,10 @@ exports.shotgunUsers = (shotgun, userOwner, updateRoommates, roomId, callback) =
                     console.error(
                         "-> User " +
                             user.username +
-                            " doesn't own the shotgun. Can't update the shotgun."
+                            " doesn't own the shotgun. Can't update the shotgun.",
                     );
                     let error = new Error(
-                        "User " + user.username + " doesn't own the shotgun. Update forbidden"
+                        "User " + user.username + " doesn't own the shotgun. Update forbidden",
                     );
                     error.name = "Error 403 : Forbidden";
                     error.httpStatusCode = "403";
@@ -67,7 +67,7 @@ exports.shotgunUsers = (shotgun, userOwner, updateRoommates, roomId, callback) =
                             return callback(
                                 user.activated
                                     ? getAlreadyShotgunError(user.username)
-                                    : getNotActivatedError(user.username)
+                                    : getNotActivatedError(user.username),
                             );
 
                         console.log("User " + user.username + " has shotgun.");
@@ -81,7 +81,7 @@ exports.shotgunUsers = (shotgun, userOwner, updateRoommates, roomId, callback) =
             },
             (err) => {
                 return callback(err);
-            }
+            },
         );
     };
 
@@ -142,6 +142,6 @@ exports.shotgunUsers = (shotgun, userOwner, updateRoommates, roomId, callback) =
                 console.log("... All users added successfully.");
                 callback(null, foundRoommatesId);
             }
-        }
+        },
     );
 };

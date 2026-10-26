@@ -6,7 +6,7 @@ let EditionSchema = new mongoose.Schema({
     year: {
         type: mongoose.Schema.Types.Number,
         required: true,
-        unique: "This year is already in the database.",
+        unique: true,
     },
     weekendDate: { type: mongoose.Schema.Types.Date, required: true },
     shotgunDate: { type: mongoose.Schema.Types.Date, required: true },

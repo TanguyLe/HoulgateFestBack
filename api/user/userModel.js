@@ -5,11 +5,11 @@ let UserSchema = new mongoose.Schema({
         type: String,
         lowercase: true,
         required: true,
-        unique: "Un compte avec cet email existe déjà.",
+        unique: true,
     },
     username: {
         type: String,
-        unique: "Ce nom d'utilisateur n'est pas disponible.",
+        unique: true,
     },
     password: {
         type: String,

@@ -73,6 +73,8 @@ exports.shotgunUsers = (shotgun, userOwner, updateRoommates, roomId, callback) =
     };
 
     // update the roommates
+    // Intended: the owner picks the roommates without their consent, even ones who own a
+    // pre-shotgun (completeShotgun then deletes it). The group agrees on rooms beforehand.
     updateRoommates.forEach((item) => {
         let updateRoommate = (callback) => {
             console.log("Trying to update user:" + item);

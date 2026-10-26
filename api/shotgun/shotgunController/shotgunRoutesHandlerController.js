@@ -9,7 +9,6 @@ let mongoose = require("mongoose"),
     shotgunHelper = require("./shotgunHelperController"),
     saveShotgun = require("./shotgunSaveController"),
     shotgunUsers = require("./shotgunUsersController"),
-    rollback = require("./rollbackController"),
     shotgunErrors = require("../shotgunErrors"),
     userErrors = require("../../user/userErrors"),
     errors = require("../../utils/errors"),
@@ -145,7 +144,7 @@ exports.shotgunCreatePost = (req, res) => {
         (err, shotgun) => {
             if (err) {
                 if (!err.httpStatusCode) return errors.sendServerError(res, err);
-                return res.status(err.httpStatusCode).send({
+                return res.status(Number(err.httpStatusCode)).send({
                     meta: {
                         error_type: err.name,
                         code: err.httpStatusCode,
@@ -201,135 +200,46 @@ exports.shotgunDelete = (req, res) => {
 
     if (!isObjectId(req.params.roomId)) return sendBadParameter(res, "RoomId is not an ObjectId");
 
+    let sendError = (err) => {
+        if (!err.httpStatusCode) return errors.sendServerError(res, err);
+        res.status(Number(err.httpStatusCode)).send({
+            meta: {
+                error_type: err.name,
+                code: err.httpStatusCode,
+                error_message: err.message,
+            },
+        });
+    };
+
     console.log("Deleting Shotgun...");
-    async.waterfall(
-        [
-            // find the shotgun
-            (callback) => {
-                console.log("Find shotgun...");
-                console.log(req.params);
-                // Find shotgun
-                Shotgun.findOne({ room: req.params.roomId }).then(
-                    (shotgun) => {
-                        if (!shotgun)
-                            return callback(
-                                shotgunErrors.getShotgunNotFoundError(req.params.roomId),
-                            );
+    Promise.all([User.findOne({ email: user.email }), Shotgun.findOne({ room: req.params.roomId })])
+        .then(([owner, shotgun]) => {
+            if (!owner) throw userErrors.getUserNotFoundError("email", user.email);
+            if (!shotgun) throw shotgunErrors.getShotgunNotFoundError(req.params.roomId);
 
-                        console.log("... Shotgun found.");
-                        callback(null, shotgun);
-                    },
-                    (err) => {
-                        return callback(err);
-                    },
-                );
-            },
-            // check user owner
-            (shotgun, callback) => {
-                console.log("Check user owner...");
-                User.findOne({ email: user.email }).then(
-                    (user) => {
-                        if (!user)
-                            return callback(userErrors.getUserNotFoundError("email", user.email));
+            // only the owner can delete their shotgun, checked again in the delete query so a
+            // shotgun expired and taken by someone else in the meantime is kept
+            let forbidden = new Error(
+                "User " + owner.username + " doesn't own the shotgun. Delete forbidden",
+            );
+            forbidden.name = "Error 403 : Forbidden";
+            forbidden.httpStatusCode = "403";
+            if (String(owner._id) !== String(shotgun.user)) throw forbidden;
 
-                        // check that only the user owner can update his room
-                        if (!(String(user._id) === String(shotgun.user))) {
-                            console.error(
-                                "-> User " +
-                                    user.username +
-                                    " doesn't own the shotgun. Can't delete the shotgun.",
-                            );
-                            let error = new Error(
-                                "User " +
-                                    user.username +
-                                    " doesn't own the shotgun. Delete forbidden",
-                            );
-                            error.name = "Error 403 : Forbidden";
-                            error.httpStatusCode = "403";
-                            return callback(error);
-                        }
-                        callback();
-                    },
-                    (err) => {
-                        return callback(err);
-                    },
-                );
-            },
-            // Delete shotgun
-            (callback) => {
-                Shotgun.findOneAndDelete({ room: req.params.roomId }).then(
-                    (deletedShotgun) => {
-                        if (!deletedShotgun)
-                            return callback(
-                                shotgunErrors.getShotgunNotFoundError(req.params.roomId),
-                            );
-                        console.log("... Shotgun successfully deleted.");
-                        timeout.clearShotgunTimeout(deletedShotgun); // remove timeout set when the shotgun was created
-                        callback(null, deletedShotgun);
-                    },
-                    (err) => {
-                        console.error("-> Shotgun deleting error.");
-                        return callback(
-                            errors.getServerError(
-                                "Shotgun with roomId " +
-                                    req.params.roomId +
-                                    " could not be deleted.",
-                            ),
-                        );
-                    },
-                );
-            },
-            (shotgun, callback) => {
-                // roll back the roommates
-                let rollBackRoommates = (shotgun, callback) => {
-                    let users = shotgun.roommates;
-                    if (!users) {
-                        console.log("No roommates to roll back.");
-                        return callback();
-                    }
-                    rollback.rollBackUsers(users, shotgun.room, (err) => {
-                        if (err) {
-                            console.error("-> Error while rolling back the users.");
-                            return callback(err);
-                        }
-                        callback();
-                    });
-                };
+            return Shotgun.findOneAndDelete({ _id: shotgun._id, user: owner._id }).then(
+                (deletedShotgun) => {
+                    if (!deletedShotgun)
+                        throw shotgunErrors.getShotgunNotFoundError(req.params.roomId);
 
-                // roll back the user owner
-                let updateUserOwner = (shotgun, callback) => {
-                    // special tratment for user owner
-                    User.findByIdAndUpdate(shotgun.user, {
-                        hasShotgun: false,
-                        hasPreShotgun: false,
-                        room: null,
-                    }).then((user) => {
-                        console.log("User " + user.username + " rolled back.");
-                        callback();
-                    }, callback);
-                };
-
-                async.parallel(
-                    {
-                        rollBack: rollBackRoommates.bind(null, shotgun),
-                        update: updateUserOwner.bind(null, shotgun),
-                    },
-                    callback,
-                );
-            },
-        ],
-        (err) => {
-            if (err) {
-                console.error("-> Error while deleting from DB.");
-                if (!err.httpStatusCode) return errors.sendServerError(res, err);
-                return res.status(err.httpStatusCode).send({
-                    meta: {
-                        error_type: err.name,
-                        code: err.httpStatusCode,
-                        error_message: err.message,
-                    },
-                });
-            }
+                    timeout.clearShotgunTimeout(deletedShotgun);
+                    return shotgunUsers.freeUsers(
+                        [deletedShotgun.user, ...deletedShotgun.roommates],
+                        deletedShotgun.room,
+                    );
+                },
+            );
+        })
+        .then(() => {
             console.log("... Shotgun deleted.");
             res.send({
                 meta: {
@@ -337,8 +247,11 @@ exports.shotgunDelete = (req, res) => {
                     desc: "Shotgun deleted successfully!",
                 },
             });
-        },
-    );
+        })
+        .catch((err) => {
+            console.error("-> Error while deleting the shotgun: " + err);
+            sendError(err);
+        });
 };
 
 // Display list of all shotguned rooms.
@@ -474,7 +387,7 @@ exports.roommatesAdd = (req, res, next) => {
                     });
                 } else if (!err.httpStatusCode) return errors.sendServerError(res, err);
                 else
-                    return res.status(err.httpStatusCode).send({
+                    return res.status(Number(err.httpStatusCode)).send({
                         meta: {
                             error_type: err.name,
                             code: err.httpStatusCode,

@@ -5,6 +5,7 @@ let mongoose = require("mongoose"),
     Room = mongoose.model("Rooms"),
     historizeController = require("../shotgun/shotgunController/historizeController"),
     timeout = require("../shotgun/shotgunController/timeoutController"),
+    { freeUsers } = require("../shotgun/shotgunController/shotgunUsersController"),
     userActivator = require("../user/userActivator"),
     { sendServerError } = require("../utils/errors");
 
@@ -186,14 +187,6 @@ const populateShotgun = (query) =>
         .populate("room", "text nbBeds")
         .populate("user", "username")
         .populate("roommates", "username");
-
-// The users no longer own nor sleep in the room. Only the ones still linked to it are changed,
-// in case one of them was moved to another room in the meantime.
-const freeUsers = (userIds, roomId) =>
-    User.updateMany(
-        { _id: { $in: userIds }, room: roomId },
-        { $set: { hasShotgun: false, hasPreShotgun: false, room: null } },
-    );
 
 // The current shotguns, and how many shotguns each edition already has in the history
 exports.shotgunList = (req, res) => {

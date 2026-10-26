@@ -23,34 +23,17 @@ exports.deleteShotguns = (usersId, callback) => {
 
                     timeout.clearShotgunTimeout(deletedShotgun); // remove the timeout that checks if the shotgun has been finalised
 
-                    User.findById(item)
-                        .then((user) => async () => {
-                            // if the user is still linked to the deleted shotgun's room
-                            if (String(user.room) === String(deletedShotgun.roomId)) {
-                                user.room = null;
-                            }
-                            user.hasPreShotgun = false; // the user doesn't own a room anymore
+                    // the user doesn't own a room anymore, nor sleeps in it if still linked to it
+                    let update = { hasPreShotgun: false };
+                    return User.findById(item).then((user) => {
+                        if (!user) return callback();
+                        if (String(user.room) === String(deletedShotgun.room)) update.room = null;
 
-                            await user
-                                .save()
-                                .then((user) => {
-                                    console.log(
-                                        "User " + user.username + " doesn't own a room anymore."
-                                    );
-                                    return callback();
-                                })
-                                .catch((err) => {
-                                    console.error(
-                                        "-> User " + user.username + " could not be updated."
-                                    );
-                                    return callback(
-                                        errors.getServerError("Couldn't save " + user.username)
-                                    );
-                                });
-                        })
-                        .catch((err) => {
-                            return callback(err);
+                        return User.updateOne({ _id: item }, { $set: update }).then(() => {
+                            console.log("User " + user.username + " doesn't own a room anymore.");
+                            return callback();
                         });
+                    });
                 })
                 .catch((err) => {
                     return callback(err);

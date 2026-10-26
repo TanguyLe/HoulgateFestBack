@@ -1,5 +1,6 @@
 let express = require("express"),
     cors = require("cors"),
+    helmet = require("helmet"),
     bodyParser = require("body-parser"),
     app = express(),
     port = process.env.PORT || 3000,
@@ -20,6 +21,21 @@ let express = require("express"),
     timeRoutes = require("./api/time/timeRoutes");
 
 scriptsUtils.connectToDb(scriptsUtils.getMongoDbUriFromEnv());
+
+// The API only answers JSON: nothing in a response may load, run or be framed if a browser renders it
+app.use(
+    helmet({
+        contentSecurityPolicy: {
+            useDefaults: false,
+            directives: { defaultSrc: ["'none'"], frameAncestors: ["'none'"] },
+        },
+    })
+);
+// These responses carry access and refresh tokens, so browsers and proxies must not store them
+app.use(["/login", "/refreshLogin", "/users/:user/activate"], (req, res, next) => {
+    res.set("Cache-Control", "no-store");
+    next();
+});
 
 // Only the front may call the API from a browser: without FRONT_HOST, only front previews are allowed
 if (!process.env.FRONT_HOST)

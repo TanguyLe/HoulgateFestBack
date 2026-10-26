@@ -14,6 +14,7 @@ let express = require("express"),
     userRoutes = require("./api/user/userRoutes"),
     userRoutesWithAuth = require("./api/user/userRoutesWithAuth"),
     editionRoutes = require("./api/edition/editionRoutes"),
+    adminRoutes = require("./api/admin/adminRoutes"),
     roomRoutes = require("./api/room/roomRoutes"),
     shotgunRoutes = require("./api/shotgun/shotgunRoutes"),
     contactRoutes = require("./api/contact/contactRoutes"),
@@ -52,6 +53,7 @@ timeRoutes(app);
 app.use(middleware.userAuth);
 userRoutesWithAuth(app);
 editionRoutes(app);
+adminRoutes(app);
 app.use(middleware.hasStarted);
 roomRoutes(app);
 shotgunRoutes(app);

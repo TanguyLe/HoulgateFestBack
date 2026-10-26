@@ -1,4 +1,5 @@
-let tokenUtils = require("./token"),
+let mongoose = require("mongoose"),
+    tokenUtils = require("./token"),
     labels = require("../../labels"),
     editionController = require("../edition/editionController"),
     { sendServerError } = require("./errors");
@@ -21,6 +22,20 @@ exports.userAuth = (req, res, next) => {
 
     if (req.user !== null) next();
     else res.status(401).send({ message: labels.FAILED_AUTH_INVALID_CRED_MSG });
+};
+
+// Admin rights are read from the DB on each request, not from the token, so removing them applies at once
+exports.adminAuth = (req, res, next) => {
+    mongoose
+        .model("Users")
+        .findOne({ email: String(req.user.email) })
+        .then((user) => {
+            if (user && user.activated && user.isAdmin) {
+                req.admin = user;
+                next();
+            } else res.status(403).send({ message: labels.ADMIN_ONLY_MSG });
+        })
+        .catch((err) => sendServerError(res, err));
 };
 
 exports.hasStarted = (req, res, next) => {

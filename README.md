@@ -50,7 +50,8 @@ This part mostly apply to `dev` environments but would work the same for any.
 -   If you use a local mongodb, make sure the service for the db runs by using `sudo service mongod start`
 -   Set `MONGO_CONNECTION` at the mongo uri before running any script
     (in `dev` the current value in the env file is `mongodb://localhost/Userdb`)
--   If you plan to use emails, you have to set `GMAIL_USER` and `GMAIL_PASSWORD`
+-   If you plan to use emails, set `BREVO_API_KEY` (a [Brevo](https://www.brevo.com) API key, used in production
+    since Render blocks outbound SMTP), or else `GMAIL_USER` and `GMAIL_PASSWORD` to send through Gmail SMTP
 
 You may want to perform the DB operations 1 to 3 before starting if you use a fresh db (see below).
 The following commands are all defined using npm scripts from the package.json.

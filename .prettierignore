@@ -1,1 +1,4 @@
 node_modules
+
+# activator reads the subject from line 1 and skips line 2: formatting would merge them
+api/user/templates

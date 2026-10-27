@@ -12,7 +12,7 @@ let mongoose = require("mongoose"),
 // Only these fields can be changed from the admin interface: emails and usernames stay the users'
 // own, and the shotgun state (hasShotgun, room...) is only changed by the shotgun routes
 const EDITABLE_USER_FIELDS = ["activated", "isAdmin"];
-const EDITION_FIELDS = ["year", "weekendDate", "shotgunDate"];
+const EDITION_FIELDS = ["year", "weekendDate", "shotgunDate", "scoresBoardUrl"];
 
 const pick = (body, fields) =>
     fields.reduce((picked, field) => {
@@ -33,9 +33,11 @@ const adminError = (status, message) => Object.assign(new Error(message), { stat
 
 const sendEditionError = (res, err) => {
     if (err.name === "ValidationError" || err.name === "CastError")
-        return res
-            .status(400)
-            .send({ message: "Édition invalide : l'année et les deux dates sont requises." });
+        return res.status(400).send({
+            message:
+                "Édition invalide : l'année et les deux dates sont requises, " +
+                "et le lien du tableau des scores doit commencer par https://.",
+        });
 
     if (err.code === 11000)
         return res.status(409).send({ message: "Une édition existe déjà pour cette année." });

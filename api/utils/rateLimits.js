@@ -4,6 +4,10 @@ const MINUTE = 60 * 1000;
 
 let limiter = (windowMs, limit) =>
     rateLimit({
+        handler: (req, res, next, options) => {
+            console.warn(`Rate limit hit on ${req.method} ${req.path} by ${req.ip}`);
+            res.status(options.statusCode).send(options.message);
+        },
         windowMs: windowMs,
         limit: limit,
         standardHeaders: "draft-8",

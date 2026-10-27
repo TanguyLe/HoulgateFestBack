@@ -14,7 +14,7 @@ exports.mailSender = (mailContent, cb, triedOnce) => {
         let mailOptions = Object.assign(STANDARD_VALUES, mailContent);
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
-                console.error(error);
+                console.error("Email to " + mailContent.to + " failed:", error);
                 return cb(error);
             }
             transporter.close();
@@ -31,7 +31,10 @@ exports.mailSender = (mailContent, cb, triedOnce) => {
                     error.httpStatusCode = "500";
                     cb(error);
                 }
-            } else return cb(false);
+            } else {
+                console.log('Email "' + mailContent.subject + '" sent to ' + mailContent.to);
+                return cb(false);
+            }
         });
     } catch (err) {
         console.error("Catch error: " + err);

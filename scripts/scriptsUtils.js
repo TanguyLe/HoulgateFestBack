@@ -37,7 +37,13 @@ module.exports = {
     },
     connectToDb: (mongoDBUri) => {
         mongoose.connection.on("error", console.error.bind(console, "MongoDB connection error:"));
-        mongoose.connect(mongoDBUri);
+        mongoose.connection.on("connected", () => console.log("MongoDB connected"));
+        mongoose.connection.on("disconnected", () => console.warn("MongoDB disconnected"));
+        mongoose.connection.on("reconnected", () => console.log("MongoDB reconnected"));
+        // the initial connection failing rejects here, not through the "error" event
+        mongoose
+            .connect(mongoDBUri)
+            .catch((err) => console.error("MongoDB connection failed:", err));
 
         return mongoose.connection;
     },

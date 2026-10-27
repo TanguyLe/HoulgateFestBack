@@ -69,7 +69,7 @@ app.set("trust proxy", 1);
 app.post("/login", rateLimits.login);
 app.post("/users", rateLimits.signUp, captcha.verify);
 app.post("/passwordReset", rateLimits.passwordReset);
-app.post("/contact", rateLimits.contact);
+app.post("/contact", rateLimits.contact, captcha.verify);
 
 statusRoutes(app);
 userRoutes(app);

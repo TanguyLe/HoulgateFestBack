@@ -4,9 +4,10 @@ const SITEVERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverif
 const CAPTCHA_FAILED_MSG = "La vérification anti-robot a échoué, réessaie.";
 
 if (!process.env.TURNSTILE_SECRET_KEY)
-    console.warn("TURNSTILE_SECRET_KEY is not set: sign ups will be refused");
+    console.warn("TURNSTILE_SECRET_KEY is not set: sign ups and contact messages will be refused");
 
-// Checks the Cloudflare Turnstile token the sign up form sends, so bots can't create accounts.
+// Checks the Cloudflare Turnstile token the sign up and contact forms send, so bots can't create
+// accounts or send mails.
 // Tokens are single use and expire after 5 minutes: the front gets a new one after each attempt
 exports.verify = (req, res, next) => {
     let token = req.body.captcha;

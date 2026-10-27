@@ -53,8 +53,8 @@ This part mostly apply to `dev` environments but would work the same for any.
 - If you plan to use emails, set `BREVO_API_KEY` (a [Brevo](https://www.brevo.com) API key, used in production
   since Render blocks outbound SMTP), or else `GMAIL_USER` and `GMAIL_PASSWORD` to send through Gmail SMTP
 - Set `TURNSTILE_SECRET_KEY` to the secret key of the [Cloudflare Turnstile](https://developers.cloudflare.com/turnstile/)
-  widget the front uses to check sign ups are not made by bots (the `dev` env file uses Cloudflare's always-passing
-  test key). Without it, every sign up is refused
+  widget the front uses to check sign ups and contact messages are not made by bots (the `dev` env file uses
+  Cloudflare's always-passing test key). Without it, every sign up and contact message is refused
 
 You may want to perform the DB operations 1 to 3 before starting if you use a fresh db (see below).
 The following commands are all defined using npm scripts from the package.json.

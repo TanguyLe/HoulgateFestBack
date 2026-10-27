@@ -30,22 +30,30 @@ exports.login = (req, res) => {
 
     User.findOne({ email: String(req.body.email) }).then(
         (user) => {
-            if (!user)
+            if (!user) {
+                console.warn("Login refused: unknown email");
                 return res
                     .status(401)
                     .json({ wrongField: "email", message: labels.FAILED_AUTH_NO_USER_MSG });
+            }
 
-            if (!user.activated) return res.status(401).json({ wrongField: "activation" });
+            if (!user.activated) {
+                console.warn("Login refused for " + user.username + ": account not activated");
+                return res.status(401).json({ wrongField: "activation" });
+            }
 
             passwordUtils
                 .comparePassword(req.body.password, user.password)
                 .then((authenticated) => {
-                    if (!authenticated)
+                    if (!authenticated) {
+                        console.warn("Login refused for " + user.username + ": wrong password");
                         return res.status(401).json({
                             wrongField: "password",
                             message: labels.FAILED_AUTH_WRONG_PSWD_MSG,
                         });
+                    }
 
+                    console.log("User " + user.username + " logged in");
                     fillUserAndTokens(user, res);
                 })
                 .catch((err) => sendServerError(res, err));
@@ -146,14 +154,20 @@ const isInvalidCode = (message) =>
 // Answers the error of a failed activator step: an invalid or expired link, a refused password,
 // an unknown user, or a server error (e.g. the mail couldn't be sent)
 const sendActivatorError = (res, activator) => {
-    if (activator.message === "badpassword" || activator.message === "missingpassword")
+    if (activator.message === "badpassword" || activator.message === "missingpassword") {
+        console.warn("Password refused: " + activator.message);
         return res
             .status(400)
             .json({ errors: { password: { message: passwordUtils.PASSWORD_POLICY_MSG } } });
-    if (activator.code === 404)
+    }
+    if (activator.code === 404) {
+        console.warn("Activation or password reset refused: unknown user");
         return res.status(404).json({ message: labels.FAILED_AUTH_NO_USER_MSG });
-    if (isInvalidCode(activator.message))
+    }
+    if (isInvalidCode(activator.message)) {
+        console.warn("Activation or password reset refused: invalid or expired link");
         return res.status(400).json({ message: labels.INVALID_LINK_MSG });
+    }
 
     sendServerError(res, activator.message);
 };
@@ -226,6 +240,7 @@ exports.beforeCreatePasswordReset = (req, res, next) => {
 exports.afterCreatePasswordReset = (req, res) => {
     if (!activatorSucceeded(req)) return sendActivatorError(res, req.activator || {});
 
+    console.log("Password reset requested for user " + req.params.user.username);
     res.status(200).json({});
 };
 

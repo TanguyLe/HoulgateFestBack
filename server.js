@@ -8,6 +8,7 @@ let express = require("express"),
     Shotgun = require("./api/shotgun/shotgunModel"),
     Edition = require("./api/edition/editionModel"),
     middleware = require("./api/utils/middleware"),
+    logging = require("./api/utils/logging"),
     rateLimits = require("./api/utils/rateLimits"),
     captcha = require("./api/utils/captcha"),
     scriptsUtils = require("./scripts/scriptsUtils"),
@@ -21,7 +22,10 @@ let express = require("express"),
     contactRoutes = require("./api/contact/contactRoutes"),
     timeRoutes = require("./api/time/timeRoutes");
 
+logging.logProcessErrors();
 scriptsUtils.connectToDb(scriptsUtils.getMongoDbUriFromEnv());
+
+app.use(logging.requestLogger);
 
 // The API only answers JSON: nothing in a response may load, run or be framed if a browser renders it
 app.use(
@@ -80,5 +84,6 @@ roomRoutes(app);
 shotgunRoutes(app);
 
 app.use(middleware.notFound);
+app.use(logging.errorHandler);
 
 app.listen(port, () => console.log("HoulgateFestBack server started on: " + port));
